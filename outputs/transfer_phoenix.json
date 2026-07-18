@@ -1,0 +1,180 @@
+{
+  "city": "phoenix",
+  "train_dates": [
+    "2024-07-15",
+    "2024-07-17",
+    "2024-07-20"
+  ],
+  "test_dates": [
+    "2024-07-22",
+    "2024-07-24"
+  ],
+  "austin_coefs": {
+    "absorption_impervious": 0.8032048349373482,
+    "absorption_vegetation": 0.4343335062899218,
+    "absorption_water": 0.1783805014036287,
+    "et_coeff": 10.975338863280236,
+    "diffusion_m2_s": 1.0
+  },
+  "rows": [
+    {
+      "row": "zero_shot",
+      "train_dates": [],
+      "test_r_mean": 0.08026304236046578,
+      "test_rmse_mean": 3.1150184869766235,
+      "test_per_day": [
+        {
+          "date": "2024-07-22",
+          "r": 0.36914581216117964,
+          "rmse": 2.8203580379486084,
+          "sim_spread": 13.614723205566406,
+          "obs_spread": 14.97998046875
+        },
+        {
+          "date": "2024-07-24",
+          "r": -0.2086197274402481,
+          "rmse": 3.4096789360046387,
+          "sim_spread": 12.236522674560547,
+          "obs_spread": 9.540008544921875
+        }
+      ],
+      "coefs": {
+        "absorption_impervious": 0.8032048349373482,
+        "absorption_vegetation": 0.4343335062899218,
+        "absorption_water": 0.1783805014036287,
+        "et_coeff": 10.975338863280236,
+        "diffusion_m2_s": 1.0
+      }
+    },
+    {
+      "row": "scheme_B_1day",
+      "train_dates": [
+        "2024-07-15"
+      ],
+      "test_r_mean": 0.07490676960891902,
+      "test_rmse_mean": 3.0611164569854736,
+      "test_per_day": [
+        {
+          "date": "2024-07-22",
+          "r": 0.3628498929387897,
+          "rmse": 2.745413064956665,
+          "sim_spread": 13.515769958496094,
+          "obs_spread": 14.97998046875
+        },
+        {
+          "date": "2024-07-24",
+          "r": -0.21303635372095167,
+          "rmse": 3.3768198490142822,
+          "sim_spread": 12.164634704589844,
+          "obs_spread": 9.540008544921875
+        }
+      ],
+      "et_coeff_fit": 5.746439958666041,
+      "coefs": {
+        "absorption_impervious": 0.8032048349373482,
+        "absorption_vegetation": 0.4343335062899218,
+        "absorption_water": 0.1783805014036287,
+        "et_coeff": 5.746439958666041,
+        "diffusion_m2_s": 1.0
+      }
+    },
+    {
+      "row": "scheme_B_3day",
+      "train_dates": [
+        "2024-07-15",
+        "2024-07-17",
+        "2024-07-20"
+      ],
+      "test_r_mean": 0.07408664413059328,
+      "test_rmse_mean": 3.0535062551498413,
+      "test_per_day": [
+        {
+          "date": "2024-07-22",
+          "r": 0.36184762670230625,
+          "rmse": 2.7346301078796387,
+          "sim_spread": 13.502063751220703,
+          "obs_spread": 14.97998046875
+        },
+        {
+          "date": "2024-07-24",
+          "r": -0.2136743384411197,
+          "rmse": 3.372382402420044,
+          "sim_spread": 12.160411834716797,
+          "obs_spread": 9.540008544921875
+        }
+      ],
+      "et_coeff_fit": 5.048263856678364,
+      "coefs": {
+        "absorption_impervious": 0.8032048349373482,
+        "absorption_vegetation": 0.4343335062899218,
+        "absorption_water": 0.1783805014036287,
+        "et_coeff": 5.048263856678364,
+        "diffusion_m2_s": 1.0
+      }
+    },
+    {
+      "row": "scheme_A_1day",
+      "train_dates": [
+        "2024-07-15"
+      ],
+      "test_r_mean": 0.03853178390661188,
+      "test_rmse_mean": 2.257331371307373,
+      "test_per_day": [
+        {
+          "date": "2024-07-22",
+          "r": 0.2833941744382203,
+          "rmse": 2.146718978881836,
+          "sim_spread": 12.432964324951172,
+          "obs_spread": 14.97998046875
+        },
+        {
+          "date": "2024-07-24",
+          "r": -0.20633060662499653,
+          "rmse": 2.36794376373291,
+          "sim_spread": 10.794052124023438,
+          "obs_spread": 9.540008544921875
+        }
+      ],
+      "coefs": {
+        "absorption_impervious": 0.8090871231529321,
+        "absorption_vegetation": 0.6885323016874165,
+        "absorption_water": 0.11029478130137582,
+        "et_coeff": 8.932195047704035,
+        "diffusion_m2_s": 1.0
+      }
+    },
+    {
+      "row": "scheme_A_3day",
+      "train_dates": [
+        "2024-07-15",
+        "2024-07-17",
+        "2024-07-20"
+      ],
+      "test_r_mean": 0.03628612829266342,
+      "test_rmse_mean": 2.226414442062378,
+      "test_per_day": [
+        {
+          "date": "2024-07-22",
+          "r": 0.2780199841081929,
+          "rmse": 2.126647472381592,
+          "sim_spread": 12.262191772460938,
+          "obs_spread": 14.97998046875
+        },
+        {
+          "date": "2024-07-24",
+          "r": -0.20544772752286605,
+          "rmse": 2.326181411743164,
+          "sim_spread": 10.634525299072266,
+          "obs_spread": 9.540008544921875
+        }
+      ],
+      "coefs": {
+        "absorption_impervious": 0.8,
+        "absorption_vegetation": 0.6885323016874165,
+        "absorption_water": 0.11029478130137582,
+        "et_coeff": 8.932195047704035,
+        "diffusion_m2_s": 1.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+scenario                      mean ΔT   max cooling   %cells<-1°C
+----------------------------------------------------------------
+baseline                       +0.00°C        +0.00°C          0.0%
+canopy_plus_20                 -1.36°C        -6.45°C         67.2%
+cool_roofs_downtown            -0.07°C        -3.57°C          2.8%
+river_greenway                 -0.42°C        -3.60°C         12.1%
+suburban_densification         +0.22°C        -3.19°C          0.6%
