@@ -1,0 +1,20 @@
+# Cached inputs: ~7 GB of WorldCover tiles, MODIS granules and ERA5 windows.
+# All of it is re-fetchable from public endpoints by the scripts in scripts/,
+# which is the point of the zero-authentication design.
+data/raw/
+data/processed/
+cache/
+
+# Local environment
+.venv/
+*.egg-info/
+__pycache__/
+*.pyc
+
+# Run logs and in-flight artifacts
+outputs/_*.log
+outputs/_*.err
+*.part
+
+# Editor / OS
+.DS_Store
