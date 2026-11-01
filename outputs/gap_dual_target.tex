@@ -1,0 +1,28 @@
+\begin{table}[ht]
+  \centering
+  \caption{Built--vegetated LST gap as a predictor of the land-cover
+  data ceiling across 49 US cities (multi-day means). Reported
+  against both ceiling definitions: the univariate correlation with
+  impervious fraction, and the multiple correlation over the three
+  channels the simulator consumes. Spearman $\rho$ with percentile
+  bootstrap 95\% CIs ($B=5000$).}
+  \label{tab:gap_dual}
+  \small
+  \begin{tabular}{lcc}
+    \toprule
+    & Univariate $r$ & Multivariate $R$ \\
+    \midrule
+    Spearman $\rho$ & $+0.844$ & $+0.691$ \\
+    95\% CI & [$+0.694$, $+0.933$] & [$+0.487$, $+0.834$] \\
+    $p$ & $2.7\times10^{-14}$ & $3.8\times10^{-8}$ \\
+    Concordant pairs & 994/1176 (85\%) & 899/1176 (76\%) \\
+    \midrule
+    Humid half, $n=24$: $\rho$ & $+0.797$ & $+0.361$ \\
+    \quad $p$ & $3.2\times10^{-6}$ & $0.08$ \\
+    \midrule
+    Paired $\Delta\rho$ (uni $-$ multi) & \multicolumn{2}{c}{$+0.153$ [$+0.034$, $+0.287$]} \\
+    Cities with negative ceiling & 5 & 0 \\
+    Four-predictor $R$ & $0.934$ & $0.773$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -1,0 +1,15 @@
+Canopy sweep (citywide canopy increment Δ):
+  canopy +Δ  | citywide ΔT  | planted ΔT  | spillover ΔT
+  --------------------------------------------------------
+     5%       |    -1.663 °C |   -1.594 °C |    -2.289 °C
+    10%       |    -1.987 °C |   -1.923 °C |    -2.365 °C
+    20%       |    -2.537 °C |   -2.534 °C |    -2.491 °C
+    40%       |    -3.251 °C |   -3.499 °C |    -2.457 °C
+
+Model vs literature reference bands:
+Metric                                  | Model (calibrated) | Literature band (approx)
+-----------------------------------------------------------------------------------------------
+Citywide cooling per +10% canopy        |  -0.445 °C        | 0.10 - 0.50 °C
+Local cooling per +10% canopy (planted) |  -0.539 °C        | 1.0 - 3.0 °C
+Patch peak cooling (1 km canopy patch)  |    3.10 °C        | (study-dependent)
+Patch half-cooling distance             | 610 m  (λ = 880 m) | 100 - 300 m

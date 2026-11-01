@@ -1,0 +1,9 @@
+# Counterfactuals under linear-ET + ERA5 calibration (calibrated_config_era5.json)
+# Shared forcing: ERA5 for 2024-08-19
+scenario                      mean ΔT   max cooling   %cells<-1°C
+----------------------------------------------------------------
+baseline                       +0.00°C        +0.00°C          0.0%
+canopy_plus_20                 -0.74°C        -4.27°C         29.2%
+cool_roofs_downtown            -0.07°C        -4.80°C          2.7%
+river_greenway                 -0.25°C        -4.87°C          8.2%
+suburban_densification         +0.18°C        -2.58°C          0.1%

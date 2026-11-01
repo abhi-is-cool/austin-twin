@@ -1,0 +1,313 @@
+%=================================================================
+%  JURSE 2027 draft (4 pages, double column).
+%
+%  Conformed to the official IEEE conference template,
+%  IEEE-conference-template-062824. The preamble below is that
+%  template's, verbatim, plus two additions: booktabs (the three
+%  tables) and url (the repository link in the acknowledgment).
+%  IEEEtran.cls ships with the template and is on Overleaf as
+%  "IEEE Conference Template".
+%
+%  Template rules observed here, so do not undo them by accident:
+%    * No math in the title or abstract. The template flags this
+%      CRITICAL -- Xplore extracts the abstract as plain text, so
+%      the correlations there are written r = +0.754, not $...$.
+%    * Floats use [htbp], tables wrap in \begin{center} with the
+%      \label after the tabular, figures use \centerline.
+%    * \begin{thebibliography}{00} -- two digits, 13 entries.
+%    * No \section*{References}; IEEEtran emits that heading.
+%    * "et al." only at six or more authors (zanaga, hersbach).
+%    * \bibitem order MUST match first-citation order; IEEE numbers
+%      references by when they are first cited. Rerun
+%      scratchpad/check_cite_order.py after adding or moving a cite.
+%
+%  FIGURES: this draft references fig_receptive_field.pdf, built by
+%  austin-twin/scripts/make_rf_figure.py from outputs/cnn_validation.json.
+%  (It previously referenced fig1_ceiling_definition.pdf, the
+%  univariate/multivariate scatter -- that figure is about channel count,
+%  not receptive field, and did not match its caption.) Only ONE figure
+%  fits the space budget -- do not add a second without cutting a table.
+%
+%  BEFORE SUBMITTING:
+%    * Confirm JURSE 2027's own call for exact page limits and
+%      whether it deviates from the stock IEEE template.
+%    * Reference [13] orphaned onto page 4 before the two cuts in
+%      Discussion para 1 and III-B. RECOMPILE to confirm it now fits;
+%      if it still spills, the next cut on the list is II-B.
+%      See paper/jurse2027_edits.md.
+%    * Confirm whether JURSE requires blind review (this draft
+%      assumes it does not, matching IGARSS-family precedent;
+%      remove the author block below if it does).
+%    * Update the GenAI disclosure to match what you actually did.
+%=================================================================
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first
+% footnote. If that is unneeded, please comment it out.
+%Template version as of 6/27/2024
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+% Added to the stock template: booktabs for the three tables, url for the
+% repository link in the acknowledgment.
+\usepackage{booktabs}
+\usepackage{url}
+
+\begin{document}
+
+\title{Why a Land-Cover Data Ceiling Must Match a Model's Receptive Field}
+
+\author{\IEEEauthorblockN{Abhiram Donepudi}
+\IEEEauthorblockA{\textit{Westwood High School} \\
+Round Rock, TX, USA \\
+abhiram.donepudi@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+When an urban heat island (UHI) model generalizes poorly to a new city, the UHI model might be instantiated on a land cover that simply does not delineate thermal regimes well enough for any land-cover-driven model to succeed---or the model might not have succeeded; the land-cover data ceiling---the achievable correlation between land surface temperature and a specified set of land-cover channels---is designed to distinguish between these possibilities, but the current work finds this ceiling only constrains a model when the model's spatial support, or receptive field, is equivalent to the ceiling's. Because a per-cell ceiling regresses temperature solely on the cell's land cover while models with spatial reach regress on the cell's land cover and that of the surrounding neighborhood, a physics-based simulator trained on held-out days in Austin, TX scored r=+0.754 against a per-cell ceiling of r=+0.693 (109\% of the presumed bound)---an artifact that was circumvented when the ceiling estimator was allowed the same neighborhood context the simulator leverages, pushing the Austin ceiling to r=+0.789; the same per-cell/context gap appears in Phoenix, Denver, and Miami. A fully-convolutional network trained directly on land cover replicated this pattern across all four cities---anchoring to the per-cell ceiling at a one-cell receptive field, tracking the context ceiling when matched, and surpassing it with an expanded one---ensuring the suggested percent-of-ceiling metric is uninterpretable unless the ceiling's receptive field is stated explicitly and matched.
+\end{abstract}
+
+\begin{IEEEkeywords}
+urban heat island, land surface temperature, MODIS, model transferability,
+convolutional networks, thermal remote sensing
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+The urban heat island has a well-established energetic basis
+\cite{oke1982energetic} and a long thermal remote-sensing literature
+\cite{voogt2003thermal}. Physically-based urban canopy schemes
+\cite{masson2000physically,kusaka2001simple,bueno2013urban} and, more
+recently, machine-learning predictors \cite{lyu2022integrated} both map
+land cover to temperature, and both face the same question when moved to a
+new city.
+
+A UHI model that does not transfer to a new city might have actually failed, or  the land-cover inputs available in that city might not separate thermal regimes well enough for \emph{any} land-cover-driven model to succeed. These reasons demand entirely different remedies (a better model versus having to concede the inputs cannot provide one) but produce identical symptoms of a low correlation against observed land surface temperature (LST) with no means of diagnosis.
+
+A \emph{land-cover data ceiling} aims to make this distinction as an observation-only benchmark of the correlation a specific set of land-cover channels can support in a city without deploying a model, but we demonstrate that a ceiling is a valid bound only when specified on the same receptive field, or spatial support, as the model it is meant to bound. Since a ceiling regressed solely on the land cover of each cell does not bound a model that takes into account the spatial neighborhood, our simulator surpasses Austin's per-cell ceiling on the very days it is scored on; matching the neighborhood size of the ceiling to that of the model reinstates the bound, and a convolutional network at three receptive fields mimics this outcome directly across four climatically diverse cities.
+
+
+\section{Materials and Methods}
+
+\subsection{Study Areas and Data}
+
+The reference city is Austin, TX, with Phoenix (AZ), Miami (FL) and Denver (CO) as transfer targets ranging from humid to arid. Data is collected anonymously, with no API keys or licenses required. Land cover uses ESA WorldCover v200 at 10~m resolution \cite{zanaga2022esa}, aggregated to a 500~m UTM grid as impervious, vegetation and water fraction. MODIS Aqua MYD11A1 v6.1 daily LST is obtained using the Microsoft Planetary Computer STAC API \cite{microsoft_pc}. MYD11A1 is available at 1~km and resampled to the 500~m analysis grid, such that neighboring cells are not independent samples---on average, Austin has 6.9 cells per LST value. This has important implications for what is presented next, in that a neighborhood-based ceiling algorithm could conceivably estimate the resampling kernel rather than actual temperature profile; Section~\ref{sec:coarsen} explores this possibility. ERA5 hourly reanalysis \cite{hersbach2020era5} is retrieved from Google's anonymous ARCO-Zarr repository.
+
+\subsection{Surface Energy-Balance Simulator}
+
+Each grid cell evolves under a slab energy balance with per-class solar
+absorption, Newtonian radiative cooling, linear evapotranspiration, and a
+Fickian diffusion term coupling each cell to its neighbors:
+\begin{equation}
+\frac{dT_i}{dt} = Q_{\mathrm{solar}} - Q_{\mathrm{rad}} - Q_{\mathrm{ET}} + Q_{\mathrm{diff}}.
+\end{equation}
+Five coefficients are tuned by differential evolution
+\cite{storn1997differential} against three training MODIS days under
+ARCO-ERA5 forcing, with two held out for testing. The diffusion term is
+what gives the model spatial reach: a cell's temperature depends on its
+neighbors' land cover, not only its own.
+
+\subsection{The Land-Cover Data Ceiling}
+
+Ceilings $C(X,Y;R)$ (channel set $X$, target $Y$, receptive field $R$) are the achievable correlation between channel set $X$ and target $Y$ predictable by an estimator with receptive field $R$ (the unexpressed $R$ argument is mostly omitted in practice, but still involves all three arguments). We compute the ceiling under two paradigms: as a multiple correlation
+(``linear''), and out-of-fold correlation of a gradient-boosted regressor \cite{friedman2001greedy} with default parameters under spatial block cross-validation across contiguous 6$\times$6-cell tiles (``nonlinear''), which breaks the linearity assumption but not receptive-field mismatch; we do not use random folds, because neighboring 500~m cells are highly autocorrelated, which makes a given test cell's ``training'' set include its own neighboring cells, inflating the ceiling toward unity.
+
+A \emph{per-cell} ceiling estimates LST from the same three channels of each cell individually. In contrast, a \emph{context} ceiling estimates LST using mask-aware neighborhood averages of the same three channels at $\sigma=1,2,4$ cells (i.e., $\approx$0.5-2~km), enclosing the simulation's diffusion length ($\approx$590~m). Smoothing was performed only for the known input (land cover) and thus does not involve crossing of any fold boundaries by any label information. Multi-day averages (between 5 and 12 clear-sky days for each city) are used, because the single-day ceilings are too noisy. Both estimators are cross-validated and therefore give conservative estimates of the capabilities of the channel set at its own receptive field: a better estimator can only increase them.
+\section{Results}
+
+\subsection{The Simulator Exceeds Its Own Per-Cell Ceiling}
+
+On the two held-out days used to score it, the calibrated simulator
+reaches $r=+0.754$ in Austin. The per-cell multiple-correlation ceiling
+on those same days is $+0.693$: the model stands at 109\% of a quantity
+that, by construction, no model consuming only per-cell land cover should
+be able to exceed. Relaxing linearity does not resolve this -- a
+gradient-boosted regressor on the same per-cell channels reaches only
+$+0.681$, still below the simulator. The gap is not a modeling failure of
+the ceiling estimator; it is a receptive-field mismatch, since the
+simulator's diffusion term gives it access to neighboring cells' land
+cover that a per-cell ceiling never offered its own estimator.
+
+\subsection{Matching Receptive Field Restores the Bound}
+
+Table~\ref{tab:receptive} gives the per-cell and context ceilings for all
+four cities. The context ceiling exceeds the per-cell ceiling in
+every city, and the gain is largest in the two cities where the per-cell
+ceiling was lowest. Austin is the only city in which a calibrated
+simulator is scored against its own ceiling, and so the only one in which
+a violation could arise; what the table adds is that the receptive-field
+gap producing it is not peculiar to Austin.
+
+\begin{table}[htbp]
+\caption{Nonlinear data ceilings under two receptive-field specifications,
+multi-day means. Context adds mask-aware neighborhood averages of the
+same three channels at $\sigma=1,2,4$ cells.}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+City & Per-Cell & Context & Gain \\
+\midrule
+Austin  & $+0.589$ & $+0.789$ & $+0.200$ \\
+Phoenix & $+0.381$ & $+0.689$ & $+0.307$ \\
+Denver  & $+0.423$ & $+0.756$ & $+0.333$ \\
+Miami   & $+0.887$ & $+0.952$ & $+0.065$ \\
+\bottomrule
+\end{tabular}
+\label{tab:receptive}
+\end{center}
+\end{table}
+
+The consequence is practical: quoted against a per-cell ceiling, a
+percent-of-ceiling figure can exceed 100\% for any model with spatial
+reach, with nothing wrong with the model.
+
+\subsection{The Gain Is Not a Resampling Artifact}
+\label{sec:coarsen}
+
+Since MYD11A1 is already natively 1~km, some portion of the gain might be due to support mismatch instead of thermal structure. To test this idea, we thus redid the comparison at resolutions of 1000~m and 1500~m, both within and above the native resolution of the data. In terms of reading the gain from 500~m, 1000~m and 1500~m, it gets reduced by roughly half in both Austin (+0.200, +0.151, +0.094) and Miami (+0.065, +0.048, +0.037), remains unchanged in Phoenix (+0.307, +0.310, +0.294), and increases in Denver, rising from +0.333 at 500~m to +0.383 at 1000~m. In Denver there is no 1500~m value: it is the smallest study site here, and when aggregated to 1500~m there are fewer than the 200 cells needed for each day.
+
+
+\subsection{A Convolutional Network Confirms the Mechanism}
+
+The argument above rests on one diffusion simulator. To test it directly,
+we trained a fully-convolutional network to predict LST from the same
+three land-cover channels under the same spatial block folds, at three
+receptive fields: 1 cell (a per-cell control, still nonlinear), 7 cells
+($\approx$3.5~km), and 13 cells ($\approx$6.5~km).
+Table~\ref{tab:cnn} and Fig.~\ref{fig:ceiling} give the result.
+
+\begin{table}[htbp]
+\caption{Convolutional models at three receptive fields, multi-day means.
+RF~=~1 is the control: a network with no spatial reach. Ceilings for the
+same cities are in Table~\ref{tab:receptive}; bold marks scores exceeding
+the context ceiling.}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+City & RF~=~1 & RF~=~7 & RF~=~13 \\
+\midrule
+Austin  & $+0.605$ & $+0.785$ & {\boldmath$+0.862$} \\
+Phoenix & $+0.407$ & $+0.608$ & {\boldmath$+0.767$} \\
+Denver  & $+0.492$ & $+0.693$ & {\boldmath$+0.842$} \\
+Miami   & $+0.876$ & $+0.949$ & {\boldmath$+0.956$} \\
+\bottomrule
+\end{tabular}
+\label{tab:cnn}
+\end{center}
+\end{table}
+
+Three findings follow, each against the ceilings in
+Table~\ref{tab:receptive}. First, architecture alone buys nothing: RF~=~1
+lands within 0.07 of the per-cell ceiling in every city, confirming that
+spatial reach, not model family, drives the gap. Second, spatial reach
+buys a great deal: RF~=~7 exceeds the per-cell ceiling by up to $+0.27$,
+in the same across-city ordering as the neighborhood-averaged gain in
+Table~\ref{tab:receptive} -- consistent with both quantities measuring
+the same underlying effect. Third, the matched ceiling bounds a matched
+model: RF~=~7 sits at or below the context ceiling in all four cities,
+while RF~=~13, whose receptive field is wider than the context ceiling's
+own smoothing scale, exceeds it everywhere -- which is expected, not a
+failure of the diagnostic, since a ceiling only bounds models at or below
+its own specified reach.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{fig_receptive_field.pdf}}
+\caption{A ceiling bounds a model only at its own receptive field. Solid:
+a fully-convolutional network's correlation with observed LST at receptive
+fields of 1, 7 and 13 cells. Dashed: the per-cell ceiling. Dotted: the
+context ceiling. RF~=~1 reproduces the per-cell ceiling, RF~=~7 tracks the
+context ceiling, and RF~=~13---wider than the context specification's own
+smoothing scale---passes it in all four cities (shaded).}
+\label{fig:ceiling}
+\end{figure}
+
+\section{Discussion}
+
+That a ceiling must span every channel a model consumes is straightforward. The receptive-field requirement is less obvious and, on this evidence, more consequential, because it changes the sign of the model/ceiling comparison rather than merely its value. A built--vegetated thermal-gap heuristic reproduces the same ceiling effect on a larger scale, involving 49 US cities, and a global version across five continents suggests the discrepancy is climate-general rather than specific to these four cities; both analyses are developed in a companion manuscript and are not claimed here.
+
+An achievable-performance bound conditioned on the available inputs is not itself new. In classification it is the Bayes error, which Fano's inequality relates to the mutual information between features and target \cite{cover2006elements}, and estimating it from finite data is an active problem in its own right \cite{noshad2019learning}. What we add is the second argument: Bayes error is defined relative to a feature set, whereas $C(X,Y;R)$ is defined relative to a feature set \emph{and} a spatial support, and on this evidence the support moves the quantity further than the channels do.
+
+A specification limitation is worth stating plainly: our context ceiling uses three fixed Gaussian scales chosen to bracket the simulator's diffusion length, not a search over receptive fields. The matched ceiling we report is therefore at least as high as stated and may be higher, which keeps the direction of every conclusion here safe while leaving the magnitude a lower bound. A model class with a wider or differently shaped receptive field -- as our own RF~=~13 network demonstrates -- needs its own matched ceiling before a percent-of-ceiling comparison against it means anything.
+
+\section{Conclusion}
+
+A data ceiling for land cover data only serves to distinguish a true data limitation from a failed model when the receptive field for the ceiling is defined relative to the model it seeks to bound. We show here that this is not an academic issue, as our simulator exceeds Austin's cell-wise ceiling on its test days, while a convolutional network reproduces the same exceedance as a function of receptive field in four different climatic cities. Failing to specify the receptive field for a reported data ceiling is therefore not just an omission -- it is also misleading.
+
+\section*{Acknowledgment}
+During the preparation of this work the author used Claude (Anthropic)
+for software implementation, analysis scripting, and drafting of earlier
+manuscript versions. All research questions, methodological decisions and
+interpretations are the author's own. This research received no external
+funding. Source code and data-regeneration scripts are available at
+\url{https://github.com/abhi-is-cool/austin-twin}.
+
+\begin{thebibliography}{00}
+
+\bibitem{oke1982energetic}
+T.~R. Oke, ``The energetic basis of the urban heat island,'' \emph{Q. J.
+R. Meteorol. Soc.}, vol.~108, pp. 1--24, 1982.
+
+\bibitem{voogt2003thermal}
+J.~A. Voogt and T.~R. Oke, ``Thermal remote sensing of urban climates,''
+\emph{Remote Sens. Environ.}, vol.~86, pp. 370--384, 2003.
+
+\bibitem{masson2000physically}
+V.~Masson, ``A physically-based scheme for the urban energy budget in
+atmospheric models,'' \emph{Bound.-Layer Meteorol.}, vol.~94, pp.
+357--397, 2000.
+
+\bibitem{kusaka2001simple}
+H.~Kusaka, H.~Kondo, Y.~Kikegawa, and F.~Kimura, ``A simple single-layer
+urban canopy model for atmospheric models,'' \emph{Bound.-Layer
+Meteorol.}, vol.~101, pp. 329--358, 2001.
+
+\bibitem{bueno2013urban}
+B.~Bueno, L.~Norford, J.~Hidalgo, and G.~Pigeon, ``The urban weather
+generator,'' \emph{J. Build. Perform. Simul.}, vol.~6, pp. 269--281,
+2013.
+
+\bibitem{lyu2022integrated}
+F.~Lyu, S.~Wang, S.~Y. Han, C.~Catlett, and S.~Wang, ``An integrated
+cyberGIS and machine learning framework for fine-scale prediction of
+urban heat island,'' \emph{Urban Inform.}, vol.~1, art.~6, 2022.
+
+\bibitem{zanaga2022esa}
+D.~Zanaga \emph{et al.}, ``ESA WorldCover 10~m 2021 v200,'' Zenodo, 2022.
+
+\bibitem{microsoft_pc}
+Microsoft, ``Planetary Computer STAC API,'' 2023. [Online]. Available:
+https://planetarycomputer.microsoft.com
+
+\bibitem{hersbach2020era5}
+H.~Hersbach \emph{et al.}, ``The ERA5 global reanalysis,'' \emph{Q. J. R.
+Meteorol. Soc.}, vol.~146, pp. 1999--2049, 2020.
+
+\bibitem{storn1997differential}
+R.~Storn and K.~Price, ``Differential evolution -- a simple and
+efficient heuristic for global optimization over continuous spaces,''
+\emph{J. Glob. Optim.}, vol.~11, pp. 341--359, 1997.
+
+\bibitem{friedman2001greedy}
+J.~H. Friedman, ``Greedy function approximation: a gradient boosting
+machine,'' \emph{Ann. Stat.}, vol.~29, pp. 1189--1232, 2001.
+
+\bibitem{cover2006elements}
+T.~M. Cover and J.~A. Thomas, \emph{Elements of Information Theory}, 2nd~ed.
+Hoboken, NJ, USA: Wiley-Interscience, 2006.
+
+\bibitem{noshad2019learning}
+M.~Noshad, L.~Xu, and A.~Hero, ``Learning to benchmark: Determining best
+achievable misclassification error from training data,'' 2019,
+arXiv:1909.07192. [Online]. Available: https://arxiv.org/abs/1909.07192
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,9 @@
+{
+  "n_cities": 49,
+  "spearman_gap_vs_ceiling": 0.8438775510204081,
+  "p_value": 2.66027498640452e-14,
+  "perfect_rank_ordering": false,
+  "concordant_fraction": 0.8452380952380952,
+  "multivariate_R": 0.9341612939448442,
+  "gap_only_R": 0.8268969207645537
+}

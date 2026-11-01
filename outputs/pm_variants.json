@@ -1,0 +1,146 @@
+[
+  {
+    "variant": "linear ET (reference)",
+    "test_r": 0.7539730082377353,
+    "test_rmse": 1.4030635952949524,
+    "delta_vs_linear": 0.0,
+    "coefs": {
+      "absorption_impervious": 0.8000956493906252,
+      "absorption_vegetation": 0.464062216303592,
+      "absorption_water": 0.17561753725742327,
+      "et_coeff": 8.677337117850318,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": false
+  },
+  {
+    "variant": "PM air VPD, k=3 (canonical)",
+    "test_r": 0.41096201940750365,
+    "test_rmse": 1.89103764295578,
+    "delta_vs_linear": -0.3430109888302316,
+    "coefs": {
+      "absorption_impervious": 0.953256081786603,
+      "absorption_vegetation": 0.30071228398251315,
+      "absorption_water": 0.06470304339044361,
+      "et_coeff": 47.01067400178235,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "air",
+    "pm_lai_k": 3.0
+  },
+  {
+    "variant": "PM air VPD, k=1",
+    "test_r": 0.4849384673089365,
+    "test_rmse": 1.8202157020568848,
+    "delta_vs_linear": -0.26903454092879875,
+    "coefs": {
+      "absorption_impervious": 0.8068846295132316,
+      "absorption_vegetation": 0.30515752743390273,
+      "absorption_water": 0.04505502084783258,
+      "et_coeff": 7.772125145868994,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "air",
+    "pm_lai_k": 1.0
+  },
+  {
+    "variant": "PM air VPD, linear LAI",
+    "test_r": 0.4617465807346399,
+    "test_rmse": 1.8519808053970337,
+    "delta_vs_linear": -0.29222642750309535,
+    "coefs": {
+      "absorption_impervious": 0.8061800420218259,
+      "absorption_vegetation": 0.30447626970268615,
+      "absorption_water": 0.04351165933848601,
+      "et_coeff": 19.884691626975243,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "air",
+    "pm_lai_mode": "linear"
+  },
+  {
+    "variant": "PM surface VPD, k=3",
+    "test_r": 0.4501935896931069,
+    "test_rmse": 1.8466352820396423,
+    "delta_vs_linear": -0.30377941854462837,
+    "coefs": {
+      "absorption_impervious": 0.9598613418224226,
+      "absorption_vegetation": 0.3009498381729838,
+      "absorption_water": 0.07692129657798746,
+      "et_coeff": 44.15011787472113,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "surface",
+    "pm_lai_k": 3.0
+  },
+  {
+    "variant": "PM surface VPD, k=1",
+    "test_r": 0.5091526355125775,
+    "test_rmse": 1.7836458086967468,
+    "delta_vs_linear": -0.24482037272515778,
+    "coefs": {
+      "absorption_impervious": 0.8004093856170342,
+      "absorption_vegetation": 0.30889841009124364,
+      "absorption_water": 0.052808910018401815,
+      "et_coeff": 54.27457185098936,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "surface",
+    "pm_lai_k": 1.0
+  },
+  {
+    "variant": "PM surface VPD, linear LAI",
+    "test_r": 0.4886196261767025,
+    "test_rmse": 1.812142014503479,
+    "delta_vs_linear": -0.26535338206103276,
+    "coefs": {
+      "absorption_impervious": 0.8034697087907884,
+      "absorption_vegetation": 0.3,
+      "absorption_water": 0.08275290341701341,
+      "et_coeff": 54.846073083458805,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "surface",
+    "pm_lai_mode": "linear"
+  },
+  {
+    "variant": "big-leaf bulk, k=3",
+    "test_r": 0.593640516436527,
+    "test_rmse": 1.6788418889045715,
+    "delta_vs_linear": -0.16033249180120823,
+    "coefs": {
+      "absorption_impervious": 0.8007669901446266,
+      "absorption_vegetation": 0.568898512416861,
+      "absorption_water": 0.1685657413668419,
+      "et_coeff": 40.921173017617605,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "bulk",
+    "pm_lai_k": 3.0,
+    "pm_max_evaporative_fraction": 1.5
+  },
+  {
+    "variant": "big-leaf bulk, linear LAI",
+    "test_r": 0.5988966548029291,
+    "test_rmse": 1.6814302206039429,
+    "delta_vs_linear": -0.1550763534348062,
+    "coefs": {
+      "absorption_impervious": 0.8,
+      "absorption_vegetation": 0.6977690426682994,
+      "absorption_water": 0.14427287930516336,
+      "et_coeff": 40.69008512314788,
+      "diffusion_m2_s": 1.0
+    },
+    "use_pm_et": true,
+    "pm_vpd_mode": "bulk",
+    "pm_max_evaporative_fraction": 1.5,
+    "pm_lai_mode": "linear"
+  }
+]

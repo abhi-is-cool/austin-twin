@@ -1,0 +1,14 @@
+[
+  {
+    "variant": "PM, air VPD, K=1",
+    "refit_test_r": 0.48408516303132876,
+    "published": 0.485,
+    "delta": -0.0009148369686712288
+  },
+  {
+    "variant": "PM, surface VPD, K=1",
+    "refit_test_r": 0.5047690708015857,
+    "published": 0.509,
+    "delta": -0.004230929198414279
+  }
+]

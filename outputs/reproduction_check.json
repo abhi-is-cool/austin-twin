@@ -1,0 +1,25 @@
+{
+  "target": {
+    "test_r": 0.85,
+    "test_rmse": 1.089
+  },
+  "reproduced": {
+    "numpy": {
+      "test_r": 0.8495472238565318,
+      "test_rmse": 1.089250922203064
+    },
+    "torch cpu": {
+      "test_r": 0.8495472260814245,
+      "test_rmse": 1.089250922203064
+    },
+    "torch cuda": {
+      "test_r": 0.8495472260814245,
+      "test_rmse": 1.089250922203064
+    },
+    "torch cuda +compile": {
+      "test_r": 0.8495472019145012,
+      "test_rmse": 1.0892510414123535
+    }
+  },
+  "all_match": true
+}

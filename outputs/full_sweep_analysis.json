@@ -1,0 +1,113 @@
+{
+  "n_cities": 49,
+  "headline": {
+    "rho_uni": 0.8441836734693876,
+    "ci_uni": [
+      0.6938952838014868,
+      0.933636614308324
+    ],
+    "p_uni": 2.5494160089224696e-14,
+    "rho_multi": 0.6937755102040815,
+    "ci_multi": [
+      0.48850138535778964,
+      0.8367495490129102
+    ],
+    "p_multi": 3.2607570907006875e-08,
+    "paired_difference": {
+      "mean": 0.15079681220873453,
+      "ci": [
+        0.0333234956274105,
+        0.2865500829404394
+      ]
+    }
+  },
+  "covariates": [
+    {
+      "covariate": "built-vegetated LST gap",
+      "rho_uni": 0.8441836734693876,
+      "rho_multi": 0.6937755102040815,
+      "p_multi": 3.2607570907006875e-08
+    },
+    {
+      "covariate": "mean LST",
+      "rho_uni": -0.4651020408163265,
+      "rho_multi": -0.4177551020408163,
+      "p_multi": 0.0028202509464293635
+    },
+    {
+      "covariate": "water fraction",
+      "rho_uni": 0.5173469387755102,
+      "rho_multi": 0.5826530612244898,
+      "p_multi": 1.1209107283660409e-05
+    },
+    {
+      "covariate": "impervious fraction mean",
+      "rho_uni": -0.37663265306122445,
+      "rho_multi": -0.188469387755102,
+      "p_multi": 0.1946703964669187
+    },
+    {
+      "covariate": "LST spread (p98-p2)",
+      "rho_uni": 0.3523469387755102,
+      "rho_multi": 0.4749999999999999,
+      "p_multi": 0.0005633279611261584
+    },
+    {
+      "covariate": "impervious fraction sd",
+      "rho_uni": -0.32326530612244897,
+      "rho_multi": -0.26051020408163267,
+      "p_multi": 0.0706293847457726
+    },
+    {
+      "covariate": "vegetation fraction mean",
+      "rho_uni": 0.34448979591836726,
+      "rho_multi": 0.13591836734693877,
+      "p_multi": 0.3517509880495886
+    },
+    {
+      "covariate": "class entropy",
+      "rho_uni": -0.02877551020408163,
+      "rho_multi": 0.06255102040816325,
+      "p_multi": 0.6693995111654055
+    }
+  ],
+  "subsets": [
+    {
+      "subset": "all cities",
+      "n": 49,
+      "rho_uni": 0.8441836734693876,
+      "p_uni": 2.5494160089224696e-14,
+      "rho_multi": 0.6937755102040815,
+      "p_multi": 3.2607570907006875e-08
+    },
+    {
+      "subset": "excluding negative univariate ceilings",
+      "n": 44,
+      "rho_uni": 0.7852008456659618,
+      "p_uni": 2.785590265739465e-10,
+      "rho_multi": 0.6116983791402396,
+      "p_multi": 1.0267806342539278e-05
+    },
+    {
+      "subset": "excluding 5 most arid",
+      "n": 44,
+      "rho_uni": 0.8105708245243128,
+      "p_uni": 2.5967788822982226e-11,
+      "rho_multi": 0.6439746300211416,
+      "p_multi": 2.4030325907643324e-06
+    },
+    {
+      "subset": "humid half (below-median mean LST)",
+      "n": 24,
+      "rho_uni": 0.7965217391304347,
+      "p_uni": 3.2147317367417885e-06,
+      "rho_multi": 0.3608695652173913,
+      "p_multi": 0.08319459278354285
+    }
+  ],
+  "ndvi": {
+    "n_cities": 49,
+    "n_robust": 27,
+    "median_gain": 0.06418369004518037
+  }
+}

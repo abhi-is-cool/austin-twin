@@ -1,0 +1,1130 @@
+%  LaTeX support: latex@mdpi.com
+%=================================================================
+%  Built against the official MDPI template.
+%
+%  OVERLEAF: upload the MDPI template package first so that
+%  Definitions/mdpi.cls and its logo files are present, then add this
+%  file plus the three figures:
+%      fig_validation.pdf
+%      fig1_ceiling_definition.pdf
+%      fig_inversion_wide.pdf
+%
+%  SUGGESTED SPECIAL ISSUE:
+%      "Thermal and Optical Remote Sensing: Evaluating Urban Green
+%       Spaces and Urban Heat Islands in a Changing Climate"
+%       (section: Urban Remote Sensing)
+%       https://www.mdpi.com/journal/remotesensing/special_issues/RS_Urban_Green_UHI
+%  VERIFY THE DEADLINE YOURSELF -- mdpi.com blocks automated fetching,
+%  so the scope match is checked but the closing date is not.
+%
+%  BEFORE SUBMITTING:
+%    * Complete the GenAI disclosure in \acknowledgments so it matches
+%      what you actually did. MDPI requires this.
+%    * MDPI requires FULL author lists; entries below marked "et al."
+%      must be expanded from the original sources.
+%    * Reference [heatmat2025] has a placeholder author field. Fill it
+%      in, or delete the entry and its row in Table 1.
+%=================================================================
+
+\documentclass[remotesensing,article,submit,oneauthor]{Definitions/mdpi}
+
+%=================================================================
+% MDPI internal commands - do not modify
+\firstpage{1}
+\makeatletter
+\setcounter{page}{\@firstpage}
+\makeatother
+\pubvolume{1}
+\issuenum{1}
+\articlenumber{0}
+\pubyear{2026}
+\copyrightyear{2026}
+\datereceived{ }
+\daterevised{ }
+\dateaccepted{ }
+\datepublished{ }
+
+%=================================================================
+\Title{Separating Model Failure from Data Limits in Urban Heat Island
+Simulation: A Land-Cover Data-Ceiling Diagnostic Applied Across Five
+Continents}
+
+%\newcommand{\orcidauthorA}{0000-0000-0000-000X} % add \orcidA{} after the name
+
+\Author{Abhiram Donepudi}
+
+\AuthorNames{Abhiram Donepudi}
+
+\address{%
+$^{1}$ \quad Westwood High School, Round Rock, TX 78681, USA;
+abhiram.donepudi@gmail.com}
+
+\corres{Correspondence: abhiram.donepudi@gmail.com}
+
+\abstract{When an urban heat island (UHI) model transfers poorly to a new
+city, two explanations are normally indistinguishable: the model may fail,
+or the input land cover may not separate thermal regimes well enough for
+any land-cover-driven model to succeed there. We introduce a land-cover
+data-ceiling control that separates them. It is deliberately independent
+of any particular simulator, requiring only a city boundary, a land-cover
+raster and one satellite scene---no model run, no calibration and no
+meteorology. We define the ceiling as the multiple correlation between
+MODIS land surface temperature and the land-cover channels a model
+consumes, and show the simpler univariate alternative (impervious fraction
+alone) is unsound: it goes negative in arid cities even where the
+multivariate ceiling exceeds $R = +0.45$. We further show that a ceiling
+bounds a model only when its \emph{receptive field} matches too. A ceiling
+regressed on each cell's own land cover does not bound a model that reads
+across space: our own simulator exceeds Austin's per-cell ceiling on its
+held-out days, and matching the ceiling's spatial reach restores the
+bound. Across 49 US cities a built--vegetated thermal-gap heuristic
+predicts the ceiling (Spearman $\rho = +0.69$, $p = 3 \times 10^{-8}$).
+Extending to 28 cities on five continents under a uniform city definition
+shows the arid inversion is climatic rather than an artifact of an all-US
+sample---but also that it is a pixel-scale effect: all eleven inverting
+cities recover to ceilings between $+0.47$ and $+0.91$ once neighbourhoods
+are visible, no city in the sample remains data-limited, and the
+arid/non-arid ceiling difference ceases to be detectable ($p = 0.018$ at
+pixel scale, $p = 0.115$ matched). What limits arid cities is the scale at
+which land cover is read, not the city.}
+
+\keyword{urban heat island; land surface temperature; MODIS; class
+separability; model transferability; surface energy balance; open data;
+thermal remote sensing}
+
+%=================================================================
+\begin{document}
+
+\section{Introduction}
+
+A recurring problem in UHI model evaluation is that two distinct failure
+modes are conflated when a model is transferred to a new city. The model
+may genuinely fail to capture that city's thermal structure, or the input
+land-cover data may not separate thermal regimes well enough for
+\emph{any} land-cover-driven model to succeed. The two demand opposite
+responses---the first calls for a better model, the second for better
+inputs or an admission that the city is not tractable with these
+channels---yet they produce the same symptom, a low correlation against
+observed land surface temperature (LST), and the literature offers no
+standard way to tell them apart.
+
+This paper introduces a \emph{land-cover data-ceiling control} that makes
+the distinction explicit. The ceiling is a per-city bound on the skill
+recoverable from a given set of land-cover inputs, computed from
+observations alone. Because it involves no simulator, no calibration and
+no meteorological forcing, it is not a property of the model under test.
+
+A ceiling is only a bound relative to a stated model class, and we show
+that the class must be matched in two respects rather than one. The
+channel count is the obvious requirement. The less obvious and more
+consequential one is the \emph{receptive field}: a ceiling regressed on
+each cell's own land cover does not bound a model that reads across
+space, and our own simulator exceeds such a ceiling in its reference
+city. Matching the ceiling's spatial reach to the model's restores the
+bound, and changes which cities are judged data-limited.
+
+We exercise the diagnostic on \textsc{austin-twin}, a physics-based slab
+energy-balance simulator driven entirely by zero-authentication open data
+\cite{oke1982energetic,voogt2003thermal,masson2000physically}. The
+simulator is a vehicle here rather than the contribution. Existing UHI
+tools span two extremes. High-fidelity mesoscale models---WRF-SLUCM, TEB,
+the Urban Weather Generator \cite{bueno2013urban,kusaka2001simple}---
+resolve canopy processes but require proprietary or authenticated inputs
+and hours of compute per scenario. Machine-learning approaches
+\cite{lyu2022integrated,hoang2025geospatial,bhamjee2024detection}
+validate well against historical observations but cannot predict the
+effect of an intervention outside their training distribution, which is
+precisely what urban planning asks of them. \textsc{austin-twin} occupies
+the middle: a 2D grid model running in 10.8~ms per 48-hour simulation on
+a desktop CPU, with an explicit counterfactual engine and fully open
+inputs. Table~\ref{tab:novelty} positions it; the data-ceiling column has
+no prior entry.
+
+A second, methodological motivation concerns reproducibility. Most urban
+climate pipelines depend on authenticated inputs---reanalysis behind a
+registration wall, licensed imagery, institutional data agreements. That
+dependency is invisible in a published result and fatal to independent
+verification: a reader who cannot obtain the inputs cannot check the
+outputs. Every input used here is retrievable by anonymous HTTP request,
+which is a constraint on the design rather than a convenience.
+
+The contribution is not a new physical formulation but four reusable
+methodological results, each independent of this simulator:
+
+\begin{enumerate}
+\item A \emph{land-cover data-ceiling control}, together with the two
+specification requirements that make it a bound rather than a number.
+It must be defined across all channels a model consumes---the univariate
+alternative goes negative in arid cities---and its receptive field must
+match the model's, since a per-cell ceiling does not bound a model that
+reads across space. We pair it with a built--vegetated thermal-gap
+heuristic validated across 49 cities, and an NDVI channel screen shown to
+be a predictable, general rule rather than a single-city result.
+\item A demonstration that receptive field is not a technicality: our own
+simulator exceeds Austin's per-cell ceiling on its held-out days, and
+matching the ceiling's spatial reach both restores the bound and reverses
+which of two transfer-failure cities is judged data-limited.
+\item Evidence that the arid inversion of the land-cover--temperature
+relationship is \emph{climatic} rather than continental, established on 28
+cities across five continents under a city definition uniform enough to
+support the comparison---together with the finding that the effect is
+definition-sensitive in the American Southwest, which we report rather
+than omit.
+\item A \emph{decay-constrained two-stage calibration} quantifying the
+trade-off between MODIS pattern fidelity and intervention spatial
+realism.
+\item An \emph{evapotranspiration ablation} showing that a standard linear
+evapotranspiration (ET) term contributes nothing to spatial-pattern skill
+at 500~m, regardless of formulation.
+\end{enumerate}
+
+% TODO: reference heatmat2025 below still has a placeholder author field.
+\begin{table}[H]
+\caption{Positioning relative to existing UHI simulation and prediction
+systems. ``Zero-auth'' means all inputs are retrievable by anonymous HTTP
+request; ``counterfactual'' means the system evaluates an intervention
+outside the training distribution via an explicit causal mechanism;
+``ceiling diagnostic'' means a data-ceiling control separating model
+failure from input class-separability limits.\label{tab:novelty}}
+\begin{tabularx}{\textwidth}{lCCCCC}
+\toprule
+\textbf{System} & \textbf{Scale} & \textbf{Zero-Auth} &
+\textbf{Counterfactual} & \textbf{Sat.\ Calib.} & \textbf{Ceiling Diag.} \\
+\midrule
+WRF-SLUCM/TEB \cite{kusaka2001simple,masson2000physically} & Meso/canyon & No & Yes & Rare & No \\
+Urban Weather Generator \cite{bueno2013urban} & Neighborhood & No & Yes & No & No \\
+ML (NGBoost/CNN/GeoFM) \cite{lyu2022integrated,hoang2025geospatial} & City--regional & Partial & No & Implicit & No \\
+HeatMat \cite{heatmat2025} & District & Partial & No & Yes & No \\
+\textbf{This work} & City & Yes & Yes & Yes & Yes \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+%=================================================================
+\section{Materials and Methods}
+
+\subsection{Study Areas and City Definitions}
+
+Austin, Texas is the reference city, with Phoenix (AZ), Miami (FL) and
+Denver (CO) as transfer targets chosen to span the humid--arid range. The
+wide sweep covers 49 US cities (55 attempted, 6 dropped for insufficient
+cloud-free coverage). The global extension covers 28 cities on five
+continents.
+
+City delimitation requires care once the sample leaves the United States.
+OpenStreetMap administrative units are not internationally comparable:
+querying ``Riyadh, Saudi Arabia'' returns a 375,478~km$^2$ province,
+``Perth'' a 6~km$^2$ council area, and ``Alice Springs'' 1~km$^2$. All
+three return a valid geometry and would silently produce a number. For
+the global extension, therefore, every city---US and non-US alike---is
+defined as a 25~km-radius disc about its centre (1960~km$^2$, within the
+US sample's own range of administrative areas). Including US cities under
+this identical definition provides a comparability bridge, so that any
+US/non-US difference cannot be an artifact of how a city was delimited.
+Each city is sampled in its own warm season, with southern-hemisphere
+cities drawing on an austral-summer date pool.
+
+\subsection{Data}
+
+All inputs are retrieved anonymously, without API keys, accounts or
+licences. Austin's administrative boundary comes from OpenStreetMap.
+Land cover uses ESA WorldCover v200 at 10~m \cite{zanaga2022esa},
+aggregated to a 500~m UTM grid ($\sim$2896 cells for Austin) as class
+fractions rather than a majority class, giving three channels: impervious,
+vegetation and water fraction. MODIS Aqua MYD11A1 v6.1 daily LST is
+retrieved through the Microsoft Planetary Computer STAC API
+\cite{microsoft_pc}. The Aqua afternoon overpass ($\sim$13:30 local) is
+used deliberately, as it falls near peak surface temperature where the UHI
+signal is strongest. LST is read in its native scaled-integer form with
+the fill value masked before conversion, and reprojected by
+nearest-neighbour resampling so that fill values cannot bleed into valid
+neighbours. ERA5 hourly reanalysis \cite{hersbach2020era5} is read from
+Google's analysis-ready cloud-optimised (ARCO) Zarr mirror, which is
+anonymously readable; this replaces the registration-gated Climate Data
+Store API. MODIS NDVI (MOD13A1, 500~m) supports the channel screen.
+
+\subsection{Surface Energy Balance Simulator}
+
+Each grid cell evolves under a slab energy balance,
+\begin{equation}
+\frac{dT_i}{dt} = Q_{\mathrm{solar}} - Q_{\mathrm{rad}}
+                - Q_{\mathrm{ET}} + Q_{\mathrm{diff}},
+\label{eq:slab}
+\end{equation}
+with per-class solar absorption, Newtonian radiative cooling, linear
+evapotranspiration $Q_{\mathrm{ET}} = k_{\mathrm{ET}} f_{\mathrm{veg}}
+\max(T_i - T_{\mathrm{air}}, 0)$, and a Fickian diffusion term. Water
+cells use an explicit mixed-layer heat capacity and a fixed latent-heat
+flux rather than a single relaxation parameter. The timestep satisfies
+the Courant--Friedrichs--Lewy condition for every diffusivity in the
+search range.
+
+\subsection{Calibration}
+
+Five coefficients are tuned by differential evolution
+\cite{storn1997differential} against three training MODIS days, with two
+held out for testing. The \emph{ship configuration} uses a two-stage
+procedure: fix $D = 1.0$~m$^2$~s$^{-1}$, matching the literature
+tree-cooling half-distance \cite{ziter2019scale}, then refit the
+remaining four coefficients under ARCO-ERA5 forcing. Ship coefficients are
+transferred to Phoenix, Miami and Denver under three schemes: zero-shot;
+Scheme~B, re-optimising $k_{\mathrm{ET}}$ only; and Scheme~A,
+re-optimising all four coefficients. All configurations being compared use
+identical optimiser settings and seed, so that differences between them
+are not confounded with differences in search effort.
+
+\subsection{The Land-Cover Data Ceiling}
+
+A \emph{data-ceiling control} establishes the maximum correlation a model
+can achieve in a given city given the information its inputs carry. A
+ceiling is only meaningful relative to a stated model class, and we find
+that two properties of that class must be matched before the bound holds:
+how many channels the model reads, and how far it reads across space.
+
+\subsubsection{Channel Count}
+
+The first is straightforward. A model consuming three channels can exceed
+a one-channel correlation by construction, so a ``percent of ceiling
+achieved'' computed against the univariate $r(\mathrm{LST},
+\text{impervious})$ is not interpretable. Worse, in arid cities the
+univariate quantity goes negative even where the three-channel fit exceeds
+$R = +0.45$, because desert vegetation runs hotter than built surfaces
+there; a negative denominator makes the ratio meaningless. We therefore
+define the ceiling over all channels the model consumes, as a multiple
+correlation $R$.
+
+\subsubsection{Receptive Field}
+\label{sec:receptive}
+
+The second is less obvious and, we find, more consequential. A multiple
+correlation regresses LST on each cell's \emph{own} land cover. A model
+with any spatial reach does not work that way: our simulator diffuses
+heat, so a modelled cell depends on its neighbours' land cover as well.
+Convolutional and foundation-model approaches
+\cite{lyu2022integrated,hoang2025geospatial} have receptive fields wider
+still. Such a model has access to information a per-cell ceiling never
+offered its estimator, and can exceed that ceiling with nothing wrong.
+
+This is not hypothetical. Our own shipped configuration exceeds Austin's
+per-cell ceiling on the very days it is scored on
+(Section~\ref{sec:rfresult}), which is what led us to the distinction.
+
+We therefore also report a \emph{receptive-field-matched} ceiling,
+computed by giving the estimator mask-aware neighbourhood averages of the
+same three channels at $\sigma = 1, 2, 4$ cells (roughly 0.5--2~km),
+bracketing the shipped diffusion length of $\approx$590~m. Smoothing is
+applied to land cover, which is a known input everywhere in the city, and
+never to LST, so no label information is introduced.
+
+\subsubsection{Estimation}
+
+Both ceilings are estimated two ways: as a multiple correlation, and as
+the out-of-fold correlation of a gradient-boosted regressor
+\cite{friedman2001greedy}, which removes the linearity assumption. The
+latter uses \emph{spatial} block cross-validation over contiguous
+$6 \times 6$-cell tiles. This is not optional. Adjacent 500~m cells are
+strongly autocorrelated, so random folds train on a test cell's own
+neighbours and the score inflates toward unity, manufacturing the
+conclusion that land cover explains everything.
+
+Because single-day ceilings are noisy, we report multi-day means
+throughout (5--12 cloud-free dates per focus city; median 6 across the
+49-city sample).
+
+\subsection{Statistical Methods}
+
+Model skill is reported as the spatial correlation $r$ and RMSE of
+\emph{mean-subtracted} fields. The slab formulation carries no
+absolute-temperature anchor, so only the spatial pattern is meaningfully
+scored; an RMSE computed on raw fields additionally carries a constant
+offset the model does not attempt to predict, and would understate
+agreement for reasons unrelated to pattern skill. We state this
+explicitly because recomputing RMSE the obvious way yields a substantially
+different number.
+
+Because neighbouring grid cells are strongly autocorrelated, per-city
+confidence intervals come from a spatial block bootstrap resampling
+contiguous $6 \times 6$-cell tiles ($B = 2000$); a cell-wise bootstrap
+would understate intervals by treating each cell as independent.
+Comparisons between two configurations evaluated on the same cities use a
+\emph{paired} bootstrap, so the interval describes the difference rather
+than being inferred from two overlapping marginal intervals.
+
+City-level associations---gap against ceiling, aridity against
+ceiling---use Spearman rank correlation, since neither relationship is
+assumed linear and single extreme cities should not dominate. Group
+comparisons (arid versus humid; arid US versus arid non-US) use the
+Mann--Whitney $U$ test, reported with group sizes, because these samples
+are small enough that a non-significant result may reflect limited power
+rather than absence of an effect.
+
+%=================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Calibration and Uncertainty}
+
+Table~\ref{tab:bootstrap_ci} reports spatial block-bootstrap 95\%
+confidence intervals. The ship configuration achieves $r = +0.754$
+[$+0.718$, $+0.785$], trading 0.10 in $r$ against an unconstrained
+single-stage fit ($r = +0.850$) in exchange for physically realistic
+diffusion and intervention decay lengths (Section~\ref{sec:disc}). ERA5
+forcing contributes $+0.007$ [$+0.004$, $+0.009$] over synthetic
+forcing---small but distinguishable from zero, with the benefit being
+mainly methodological, in that it permits absolute-temperature
+comparability without anomaly normalisation.
+
+\begin{table}[H]
+\caption{Block-bootstrap 95\% confidence intervals, held-out test $r$ and
+RMSE. Both statistics are computed on mean-subtracted
+fields.\label{tab:bootstrap_ci}}
+\begin{tabularx}{\textwidth}{lCC}
+\toprule
+\textbf{Configuration} & \textbf{Test} {\boldmath$r$} \textbf{[95\% CI]} & \textbf{RMSE (}{\boldmath$^{\circ}$}\textbf{C)} \\
+\midrule
+Single-stage, synthetic forcing & $+0.850$ [$+0.823$, $+0.872$] & 1.09 \\
+Two-stage, synthetic forcing & $+0.747$ [$+0.712$, $+0.778$] & 1.48 \\
+\textbf{Ship (ARCO-ERA5)} & {\boldmath$+0.754$} [$+0.718$, $+0.785$] & \textbf{1.40} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:validation} shows the simulated field against the MODIS
+observation for a held-out day, in both absolute and anomaly form. The
+model reproduces the hot urban core and the cool riparian corridor, but
+runs a mean 3.66~$^{\circ}$C cold in absolute terms (panel~c); the
+anomaly panels (d--f) show what the reported statistics actually score.
+The residual is not spatially uniform, a point we return to in
+Section~\ref{sec:disc}.
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{fig_validation.pdf}
+\caption{Simulated versus observed LST for Austin, 21 August 2024, a
+held-out day. (\textbf{a}) Simulated peak-heat field under the ship
+configuration; (\textbf{b}) MODIS Aqua observation; (\textbf{c}) raw
+difference, which carries the $-3.66$~$^{\circ}$C mean offset;
+(\textbf{d},\textbf{e}) the same two fields after mean subtraction;
+(\textbf{f}) residual of the anomalies, which is what the reported
+$r = +0.739$ and anomaly RMSE of 1.49~$^{\circ}$C are computed from
+($n = 2868$ cells). Panels (a,b) share one colour scale, as do
+(d,e).\label{fig:validation}}
+\end{figure}
+\unskip
+
+\subsection{The Ceiling Must Match the Model's Receptive Field}
+\label{sec:rfresult}
+
+A per-cell ceiling does not bound a spatial model, and the clearest
+demonstration is our own. On the two held-out days of
+Table~\ref{tab:bootstrap_ci}, the shipped configuration scores
+$r = +0.754$ while Austin's per-cell multivariate ceiling on those same
+days is $+0.693$. The model stands at 109\% of its own ceiling.
+
+Relaxing linearity does not account for this. A gradient-boosted
+regressor on the same three per-cell channels, under spatial block
+cross-validation, reaches $+0.681$ on those days---marginally
+\emph{worse} than the linear fit, and still exceeded by the simulator.
+Across the four focus cities the per-cell nonlinear gain is small and
+inconsistently signed (Austin $-0.024$, Denver $-0.014$, Miami $+0.047$,
+Phoenix $+0.110$). Whatever the simulator is exploiting, it is not
+nonlinearity.
+
+It is spatial reach. Giving the estimator the neighbourhood-averaged
+channels of Section~\ref{sec:receptive} raises Austin's ceiling on those
+days to $+0.883$, placing the model at 85\% of it. The violation
+disappears. Table~\ref{tab:receptive} gives the multi-day picture.
+
+\begin{table}[H]
+\caption{Data ceilings under three specifications, multi-day means. The
+context column adds mask-aware neighbourhood averages of the same three
+channels at $\sigma = 1, 2, 4$ cells. Gain is the context ceiling minus
+the per-cell nonlinear one.\label{tab:receptive}}
+\begin{tabularx}{\textwidth}{lCCCC}
+\toprule
+\textbf{City} & \textbf{Linear, per-Cell} & \textbf{Nonlinear, per-Cell} &
+\textbf{Nonlinear, Context} & \textbf{Gain} \\
+\midrule
+Austin & $+0.613$ & $+0.589$ & $+0.789$ & $+0.200$ \\
+Phoenix & $+0.271$ & $+0.381$ & $+0.689$ & $+0.307$ \\
+Denver & $+0.437$ & $+0.423$ & $+0.756$ & $+0.333$ \\
+Miami & $+0.841$ & $+0.887$ & $+0.952$ & $+0.065$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The gain is not an artifact of smoothing crossing fold boundaries. At
+block sides of 6, 12 and 24 cells---the last four times the smoothing
+reach---Austin gains $+0.202$, $+0.208$ and $+0.170$, and Phoenix
+$+0.310$, $+0.252$ and $+0.290$.
+
+Two consequences follow. First, a percent-of-ceiling figure is only
+interpretable once the ceiling's receptive field matches the model's;
+quoted against a per-cell ceiling, it can exceed 100\% for any model with
+spatial reach. Second, and more practically, the gain is largest in the
+arid cities and smallest in Miami, which we return to in
+Section~\ref{sec:disc}.
+
+\subsection{Multi-City Transfer and the Ceiling Diagnostic}
+
+Table~\ref{tab:transfer} presents the transfer matrix. Against per-cell
+ceilings Miami reaches 99\% under Scheme~A ($r = +0.832$ against
+$+0.841 \pm 0.025$), while Phoenix and Denver reach 28\% and 29\%
+($+0.271 \pm 0.085$ and $+0.437 \pm 0.085$).
+
+Read against receptive-field-matched ceilings, however, the picture
+changes materially. Phoenix and Denver have ceilings of $+0.689$ and
+$+0.756$ (Table~\ref{tab:receptive}), so the achieved fractions become
+11\% and 17\%. Both cities retain substantial unrecovered headroom, and
+the earlier reading---that Denver's higher ceiling leaves room for
+calibration to exploit while Phoenix's does not---is not supported.
+Re-optimisation still degrades Phoenix ($+0.077 \rightarrow +0.033$) and
+roughly doubles Denver ($+0.056 \rightarrow +0.126$), but an absence of
+recoverable signal in Phoenix is no longer the explanation: the signal is
+present, and this simulator is not capturing it.
+
+We report this rather than the more convenient earlier framing because it
+is what the matched ceilings show, and because it sharpens what the
+diagnostic is for. The ceiling bounds what is recoverable; it does not
+diagnose \emph{why} a particular model fails to recover it.
+
+\begin{table}[H]
+\caption{Multi-city transfer, held-out test $r$ over 2 days. The ceiling
+is the multi-day mean $R$(LST; impervious, vegetation,
+water).\label{tab:transfer}}
+\begin{tabularx}{\textwidth}{lCCC}
+\toprule
+\textbf{Scheme} & \textbf{Denver} & \textbf{Phoenix} & \textbf{Miami} \\
+\midrule
+Austin ship (reference) & $+0.754$ & $+0.754$ & $+0.754$ \\
+Zero-shot & $+0.056$ & $+0.077$ & $+0.724$ \\
+Scheme B, 3 days & $+0.063$ & $+0.071$ & $+0.776$ \\
+Scheme A, 3 days & $+0.126$ & $+0.033$ & $+0.832$ \\
+\midrule
+\textbf{Ceiling} & {\boldmath$+0.437 \pm 0.085$} & {\boldmath$+0.271 \pm 0.085$} & {\boldmath$+0.841 \pm 0.025$} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Figure~\ref{fig:ceiling} shows why the univariate definition fails. Every
+city lies on or above the $y = x$ line, because the multiple correlation
+is greater than or equal to the univariate one by construction. A
+three-channel model can therefore exceed a one-channel ``ceiling'' with
+nothing wrong. Five cities fall left of $x = 0$, where a percentage of
+ceiling is undefined.
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{fig1_ceiling_definition.pdf}
+\caption{Univariate against multivariate data ceiling for the 49-city US
+sample. Points on or above the diagonal show that the multiple
+correlation is at least the univariate one by construction, so a
+multi-channel model can exceed a univariate ``ceiling'' without any
+defect. Cities left of $x = 0$ have a negative univariate ceiling, for
+which a percent-of-ceiling figure is undefined.\label{fig:ceiling}}
+\end{figure}
+\unskip
+
+\subsection{The Thermal-Gap Heuristic Across 49 Cities}
+
+The built--vegetated LST gap---mean LST over impervious cells minus mean
+LST over vegetated cells---is the physical driver behind the ceiling, and
+is far cheaper to compute. It validates across the 49-city sample: against
+the sound multivariate ceiling, Spearman $\rho = +0.69$
+($p = 3 \times 10^{-8}$).
+
+A univariate proxy target gives a more flattering $\rho = +0.84$,
+confirmed significantly higher by a paired bootstrap
+($\Delta\rho = +0.15$, [$+0.03$, $+0.29$]). We report both because the
+difference is diagnostic: part of the univariate figure's apparent
+strength comes from a shared arid sign-flip affecting both variables, not
+from gap predictiveness as such.
+
+The heuristic generalises across arid-exclusion subsets ($p < 10^{-4}$)
+with one exception, the humid half ($n = 24$, $\rho = +0.36$,
+$p = 0.08$). We leave this open: at this sample size, underpowering and a
+genuine concentration of the association in arid cities are not
+separable, and we prefer to say so rather than assert the more convenient
+reading.
+
+The association is not an artifact of measuring the ceiling at pixel
+scale. Recomputing all 49 ceilings at matched receptive field gives
+$\rho = +0.716$ ($p = 7 \times 10^{-9}$) against $+0.694$ published; a
+paired bootstrap resampling cities together puts the difference at
+$+0.022$ with 95\% CI $[-0.085, +0.142]$. The heuristic therefore
+predicts recoverable signal rather than merely per-pixel recoverable
+signal, which is what makes it usable as a screen for models of any
+receptive field. Under matched ceilings no US city is data-limited
+either---the lowest is Spokane at $+0.335$, the median $+0.785$, and none
+is negative---and all five cities that invert under OpenStreetMap limits
+recover (Boise $-0.331 \rightarrow +0.747$, Albuquerque
+$-0.308 \rightarrow +0.716$, Tucson $-0.254 \rightarrow +0.602$, Phoenix
+$-0.095 \rightarrow +0.662$, Billings $-0.034 \rightarrow +0.418$).
+
+In arid climates the land-cover--temperature relationship \emph{inverts}
+rather than merely weakening. Natural desert vegetation runs hotter than
+irrigated, shaded built surfaces, driving the univariate ceiling negative
+(Figure~\ref{fig:inversion}).
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{fig_inversion_wide.pdf}
+\caption{The inversion rendered as surface relief, where height and
+colour both encode the plotted variable. The built core rises as a
+plateau in \emph{both} cities' impervious channel (\textbf{a},\textbf{c};
+range 0--1), but the temperature surface rises with it in Austin
+(\textbf{b}; 38--48~$^{\circ}$C) and sinks into a basin in Riyadh
+(\textbf{d}; 53--57~$^{\circ}$C), where the surrounding desert is hotter
+than the city. Nothing in the land-cover input distinguishes the two
+cases, which is precisely why a univariate land-cover ceiling reports
+that no model can work in the arid one. Single representative cloud-free
+dates; Riyadh under the 25~km disc definition.\label{fig:inversion}}
+\end{figure}
+\unskip
+
+\subsection{Is the Inversion Climatic or Continental?}
+
+The 49-city sample is entirely American, so ``arid'' is confounded with
+``American Southwest'' and the inversion could reflect a continental
+artifact---a difference in construction practice, irrigation policy or
+land-use zoning rather than climate. Adding a sixth Southwest city cannot
+resolve this. We therefore repeat the diagnostic on 28 cities across five
+continents, under the uniform disc definition described in
+Section~2.1.
+
+The inversion is climatic. Eleven cities show negative univariate
+ceilings and nine of them lie outside the US (Table~\ref{tab:arid}),
+spanning Arabia, the Levant, North Africa, the Atacama, Iberia, Mexico
+and central Australia. Arid and
+humid/temperate ceilings differ sharply (median $-0.032$ against
+$+0.615$; Mann--Whitney $p = 2.4 \times 10^{-4}$), while arid US and arid
+non-US cities do \emph{not} differ detectably ($p = 0.075$)---the
+comparison an all-US sample cannot make. The gap heuristic replicates on
+this independent sample ($\rho = +0.92$ univariate, $+0.57$
+multivariate), as does the aridity link (mean LST against ceiling,
+$\rho = -0.69$).
+
+\begin{table}[H]
+\caption{Every city with a negative multi-day mean univariate ceiling
+under the uniform 25~km disc definition, on five continents. The context
+column is the receptive-field-matched ceiling of
+Section~\ref{sec:receptive}: no inverting city remains
+low.\label{tab:arid}}
+\begin{tabularx}{\textwidth}{llCCC}
+\toprule
+\textbf{City} & \textbf{Region} & \textbf{Univariate} &
+\textbf{Context} & \textbf{Gap (}{\boldmath$^{\circ}$}\textbf{C)} \\
+\midrule
+Amman & Levant & $-0.429$ & $+0.858$ & $-2.52$ \\
+Riyadh & Arabia & $-0.342$ & $+0.612$ & $-1.56$ \\
+Marrakesh & North Africa & $-0.156$ & $+0.743$ & $-1.18$ \\
+Antofagasta & South America & $-0.124$ & $+0.687$ & $-3.38$ \\
+Hermosillo & North America & $-0.116$ & $+0.686$ & $-0.99$ \\
+Madrid & Europe & $-0.102$ & $+0.468$ & $-0.51$ \\
+Billings \textsuperscript{1} & North America & $-0.101$ & $+0.640$ & $-0.61$ \\
+Alice Springs & Australia & $-0.096$ & $+0.559$ & $-3.11$ \\
+Cairo & North Africa & $-0.082$ & $+0.912$ & $+1.08$ \\
+Yuma \textsuperscript{1} & North America & $-0.067$ & $+0.866$ & $-0.48$ \\
+Mendoza & South America & $-0.032$ & $+0.859$ & $-0.57$ \\
+\bottomrule
+\end{tabularx}
+
+\noindent{\footnotesize{\textsuperscript{1} United States; the remaining
+nine lie outside it.}}
+\end{table}
+
+\subsubsection{A Robustness Caveat We Report Rather Than Omit}
+
+Inversion in the American Southwest is sensitive to how the city is
+delimited. Of the five US cities that invert under OpenStreetMap city
+limits, four (Phoenix, Tucson, Albuquerque, Boise) do \emph{not} invert
+under the disc definition; only Billings does. The hyper-arid non-US
+cities invert decisively under either definition (Antofagasta gap
+$-3.38$~$^{\circ}$C, Alice Springs $-3.11$~$^{\circ}$C), so the mechanism
+itself is real, but the US examples sit near the sign boundary and should
+not be read as definition-independent.
+
+Palm Springs is the converse control. It shows no inversion ($+0.255$)
+and the sample's largest positive gap ($+6.34$~$^{\circ}$C), in the same
+desert as Yuma, because its landscape is irrigated---the mechanism
+behaving exactly as predicted in a case selected to test it.
+
+\subsubsection{The Inversion Is a Pixel-Scale Effect}
+\label{sec:pixelscale}
+
+Applying the receptive-field-matched ceiling of
+Section~\ref{sec:receptive} to all 28 cities of the global extension
+changes what the inversion means, though not whether it is real.
+
+Every city gains, from $+0.019$ (Chicago) to $+0.593$ (Boise), and the
+size of the gain is predicted almost entirely by how low the per-cell
+ceiling was (Spearman $\rho = -0.869$, $p = 2 \times 10^{-9}$) rather
+than by aridity directly ($\rho = +0.310$, $p = 0.11$). Arid cities gain
+more (median $+0.328$ against $+0.167$, Mann--Whitney $p = 0.005$)
+because they are the cities whose per-cell ceilings were low, not because
+aridity acts on the gain through some separate route.
+
+Every inverting city recovers. All eleven cities in
+Table~\ref{tab:arid} reach a context ceiling between $+0.468$ and
+$+0.912$. More strikingly, no city anywhere in the 28-city sample is
+data-limited once the ceiling can see neighbourhoods: the lowest context
+ceiling is Windhoek's $+0.463$ and the median is $+0.779$. The spread
+across cities collapses from $0.858$ at pixel scale to $0.526$ with
+context, so much of the apparent variation in data readiness is an
+artifact of the scale at which readiness was measured.
+
+Consequently the arid/non-arid ceiling difference, which is clear at
+pixel scale (median $+0.372$ against $+0.632$, $p = 0.018$), is no longer
+detectable once receptive fields are matched ($+0.727$ against $+0.828$,
+$p = 0.115$). The thermal-gap heuristic survives this, weakened but
+significant: $\rho = +0.571$ against the linear ceiling, $+0.540$
+per-cell and $+0.483$ against the context ceiling ($p = 0.009$).
+
+The inversion is therefore a property of pixel-scale land cover rather
+than a limit on modelling arid cities. The built core still separates
+thermally from the desert around it; what fails is the assumption that
+individual built and vegetated cells separate.
+
+\subsection{Channel Screening Without a Simulator}
+
+Because the ceiling depends only on input data, candidate channels can be
+screened before any model is built. Adding MODIS NDVI raises the ceiling
+predictably across the 49-city sample: the gain correlates with ceiling
+height ($\rho = -0.55$, $p = 4.9 \times 10^{-5}$) and with aridity
+($\rho = +0.50$, $p = 2.7 \times 10^{-4}$), with 27 of 49 cities robustly
+positive and a median gain of $+0.06$.
+
+Phoenix---the irrigated-desert city that motivated adding the channel in
+the first place---ranks 4th of 49 ($+0.22$), behind Bakersfield, Spokane
+and Boise. The channel is therefore a general, aridity-driven screening
+rule rather than a single favourable city's result, which is the
+distinction that determines whether such a screen is worth applying
+elsewhere.
+
+\subsection{Evapotranspiration Ablation}
+
+Replacing the linear ET term with canonical Penman--Monteith reduces test
+$r$ from $+0.755$ to $+0.416$. Leaf-area-index saturation and
+vapour-pressure-deficit decoupling---the two mechanisms we isolated---
+together explain only 21\% of this regression. Stomatal resistance $r_s$
+recovers 61\% at its optimum ($r_s = 3200$~s~m$^{-1}$, roughly
+$32\times$ a reference grass value, and not physically defensible), but
+even there Penman--Monteith ($r = +0.686$) underperforms simply
+\emph{removing} the ET term ($r = +0.758$; Table~\ref{tab:pm}).
+
+No formulation we tested---including one tuned to a physically
+indefensible parameter specifically to maximise its own score---recovers
+what deleting the term already achieves. This reframes the question from
+``which ET formulation is best'' to ``does this linear ET term do useful
+work at 500~m at all''. On this evidence it does not.
+
+\begin{table}[H]
+\caption{Evapotranspiration formulation ablation. Each configuration is
+independently recalibrated, so the comparison is not confounded by
+coefficients fitted for a different model.\label{tab:pm}}
+\begin{tabularx}{\textwidth}{lC}
+\toprule
+\textbf{Configuration} & \textbf{Test} {\boldmath$r$} \\
+\midrule
+No ET term & {\boldmath$+0.758$} \\
+Linear ET (reference) & $+0.755$ \\
+PM, $r_s = 3200$~s~m$^{-1}$ (optimum, indefensible) & $+0.686$ \\
+PM, canonical ($K = 3$, $r_s = 100$~s~m$^{-1}$) & $+0.416$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Counterfactual Scenarios}
+
+Under ship-configuration ERA5 forcing, a $+20\%$ canopy increase produces
+a mean $\Delta T = -0.74$~$^{\circ}$C, a citywide slope of
+$-0.44$~$^{\circ}$C per 10\% canopy, within the literature band
+\cite{zhou2025tree,wri2026cooling}. A river greenway yields
+$-0.25$~$^{\circ}$C and cool roofs $-0.07$~$^{\circ}$C
+\cite{santamouris2014cool,wang2022berlin}; suburban densification, run as
+a control in the opposite direction, yields $+0.18$~$^{\circ}$C.
+
+These means are averaged over every (cell, timestep) pair in the 48-hour
+run. The convention matters: the same scenario gives
+$-1.52$~$^{\circ}$C at the final frame alone, and per-frame values swing
+between roughly $-0.3$ and $-1.5$~$^{\circ}$C across the diurnal cycle,
+so a cooling figure quoted without its averaging window is ambiguous by a
+factor of two. The spatial pattern is likewise non-uniform: cooling
+concentrates where there was impervious surface to convert, and water
+cells warm slightly relative to baseline.
+
+Two quantities fall outside their literature bands. Local per-patch
+cooling ($-0.59$~$^{\circ}$C per 10\%) is 1.5--5$\times$ below field
+measurements \cite{krayenhoff2021albedo}, and the edge-referenced
+half-cooling distance ($\approx$330~m) sits just outside the 100--300~m
+band. Both reflect the diffusion trade-off analysed below rather than
+independent defects.
+
+%=================================================================
+\section{Discussion}
+\label{sec:disc}
+
+\subsection{What Became of the Data Limit}
+\label{sec:dichotomy}
+
+This paper began from a dichotomy: a low transfer score means either that
+the model failed or that the input data could not support any model. The
+diagnostic was built to tell those apart. It is worth stating plainly what
+happened when we applied it, because the result is not the one the framing
+anticipates.
+
+Across 49 US cities under administrative boundaries and 28 cities under a
+uniform disc definition, \emph{no city is data-limited} once the ceiling
+is specified to match the model's receptive field. The lowest matched
+ceiling anywhere is $+0.335$; the median is near $+0.78$ in both samples.
+Every city-definition whose univariate ceiling is negative---sixteen of
+them, eleven in the global sample and five in the US, the cases that
+motivated the arid-inversion result---recovers to a strongly positive
+matched ceiling. The second branch of the dichotomy, as measured by land
+cover, is close to unoccupied.
+
+We read this as a positive finding rather than a null one. Low
+land-cover-versus-temperature correlations are real and are routinely
+interpreted as evidence that a city is intrinsically hard to model. Our
+results say that interpretation is usually a specification artifact: the
+correlation was measured at one scale and the model operates at another.
+The practical question shifts from \emph{whether} land cover can support a
+model in a given city to \emph{at what scale} it does, which is a question
+with an actionable answer everywhere we looked.
+
+\subsection{The Real Data Limit Is Observability, Not Separability}
+
+The dichotomy is not empty, however. It is occupied by a failure mode the
+ceiling does not measure.
+
+Of 35 cities attempted in the global extension, seven yielded no usable
+warm-season observation at all---not a weak ceiling, but zero cloud-free
+days clearing our coverage threshold. The US sweep lost a further six of
+55 the same way. These cities have no ceiling because they have no data,
+and the diagnostic is silent on them by construction, since it is computed
+from scenes that exist.
+
+The losses are not confined to one climate. Bangkok, Manila and Lagos are
+humid tropical, but Dubai, Kuwait City and Jodhpur are arid, where dust
+and haze trigger the same cloud masking as cloud does. Roughly one city in
+seven across both samples was lost this way, and the loss falls hardest on
+exactly the places where heat exposure is most severe and where modelling
+capacity is scarcest.
+
+This also conditions our own headline. ``No city is data-limited'' is
+measured among cities we could observe, and observability is not random
+with respect to climate. A complete data-readiness assessment therefore
+needs two axes, not one: whether land cover separates thermal regimes at
+some accessible scale, and whether the thermal observations needed to
+check that exist in the first place. We report the first here and can only
+flag the second, which we regard as the more urgent gap for any attempt to
+extend this diagnostic globally.
+
+\subsection{The Diffusion--Fidelity Trade-Off}
+
+No single Fickian diffusivity $D$ satisfies both MODIS spatial
+autocorrelation and literature cooling-decay scales. The best $r$
+achievable inside the 100--300~m band is $+0.67$ at $D = 0.20$, a cost of
+$-0.19$ in $r$ against the unconstrained optimum ($r = +0.85$ at
+$D \approx 12.6$). This is roughly twice the cost a naive, uncalibrated
+estimate would suggest, and it means a model tuned purely for pattern
+correlation will produce intervention footprints too diffuse to use for
+planning.
+
+\subsection{Advection Is Not a Drop-In Fix}
+
+Replacing diffusion with ERA5 wind-driven advection destroys skill
+($r = -0.11$ at 25\% strength). The reason is structural rather than a
+matter of tuning: a spatially uniform wind translates the entire surface
+pattern downwind, whereas the physical process transports heat in the air
+layer above the surface. A coupled air layer, not a one-line
+substitution, is required \cite{mitraka2025prototypes}.
+
+\subsection{Class Separability as an A Priori Screen}
+
+Because the ceiling depends only on input data, it can be computed for a
+candidate city before any modelling effort is committed. Given
+Section~\ref{sec:dichotomy}, what that buys is not a shortlist of cities
+worth modelling---on present evidence that is most of them---but the scale
+at which each city's land cover becomes informative. For an operational
+deployment across many cities this still reorders the work: establish the
+informative scale first, then calibrate at that scale rather than
+discovering the mismatch through a poor transfer score.
+
+What the screen does \emph{not} do is diagnose why a given model fails.
+Our own results make the distinction concrete. Under per-cell ceilings
+Phoenix looks data-limited and Denver looks recoverable; under
+receptive-field-matched ceilings both have ample headroom
+(Section~\ref{sec:rfresult}), and Phoenix's poor transfer becomes a
+statement about this simulator rather than about Phoenix. A low ceiling
+is evidence that no model of the matched class will do well. A high
+ceiling with a low score localises the problem to the model, which is
+useful, but it does not say which part.
+
+\subsection{Scale, Not Aridity, Is What Limits These Cities}
+
+Section~\ref{sec:pixelscale} changes the practical reading of the arid
+result. Arid cities are not intrinsically resistant to land-cover-driven
+modelling; they are poorly served by \emph{pixel-scale} land-cover models
+specifically. The remedy indicated is a wider receptive field rather than
+additional channels, and the two are not interchangeable: widening the
+receptive field raises Phoenix's ceiling by $+0.31$, whereas adding an
+NDVI channel raises it by $+0.22$ at pixel scale and leaves the
+pixel-scale limitation in place.
+
+It is worth being precise about what aridity does here, because the
+obvious reading is wrong. Every city in both samples gains from a wider
+receptive field---all 49 US cities, minimum $+0.026$---so this is not a
+correction that applies to arid cities alone. What varies is the size of
+the gain, and the gain tracks how low the per-cell ceiling was (Spearman
+$\rho = -0.707$ in the US sample, $-0.869$ globally) far more closely than
+it tracks temperature ($+0.208$, $p = 0.15$; $+0.310$, $p = 0.11$).
+Splitting the US sample at median LST, hot and cool halves gain
+indistinguishably ($+0.212$ against $+0.225$, $p = 0.73$). Arid cities
+gain more in the global sample because they are the cities whose per-cell
+ceilings are low, not because aridity acts through some separate route.
+
+This reframes what a readiness assessment should report. A single
+per-city number presumes the ceiling is a property of the city. It is
+better understood as a property of the city \emph{and} the scale at which
+its land cover is read, and the useful output for a practitioner is the
+scale at which land cover becomes informative there---which is wider than
+one pixel essentially everywhere, and widest where a pixel-scale
+assessment would have declared the city hopeless.
+
+\subsection{Structure in the Residual Bounds What Calibration Can Buy}
+
+The residual in Figure~\ref{fig:validation}f is spatially structured
+rather than noise-like. The model reproduces the hot core but places it
+slightly west of where MODIS observes it, leaving a coherent dipole. This
+is a positional error, not random misfit, and it implies that
+$r = +0.75$ is limited by something further coefficient tuning cannot
+remove. Three candidate causes, in increasing cost to test, are the
+diffusion trade-off smearing the core, an absorption composite too coarse
+to place it precisely, and a peak-frame selection offset from the Aqua
+overpass time. Establishing which dominates would bound what calibration
+can still achieve, and we flag it as the most informative next diagnostic.
+
+\subsection{Limitations}
+
+A $\sim$7~$^{\circ}$C absolute bias, arising from the simplified longwave
+scheme, couples only weakly to skill ($\Delta r = 0.02$ across a
+3~$^{\circ}$C bias sweep), but it does mean absolute temperatures should
+not be read as calibrated predictions. The 500~m grid smooths
+highway-corridor hot streaks that finer imagery resolves. Per-city
+ceilings should be read as multi-day estimates, since single-day values
+can be actively unrepresentative.
+
+Two results remain open at the present sample sizes: the humid-subset
+association of Section~3.4, and the definition-sensitivity of the US arid
+cities.
+
+A third limitation is one of specification. Our matched ceiling uses
+three Gaussian scales on three channels, chosen to bracket the shipped
+diffusion length, rather than a search over receptive fields. The matched
+ceiling is therefore at least as high as we report and may be higher,
+which makes the direction of every conclusion here safe and the
+magnitudes lower bounds. A model class with a wider or differently shaped
+receptive field---a deep convolutional stack, for instance---would need
+its own matched ceiling before a percent-of-ceiling figure against it
+would mean anything.
+
+%=================================================================
+\section{Conclusions}
+
+A land-cover data ceiling separates two failure modes that a transfer
+score alone conflates, but only when it is specified to match the model it
+is meant to bound. Two requirements matter. The ceiling must span the
+channels a model consumes---the univariate alternative goes negative in
+arid cities, where a percent-of-ceiling figure becomes undefined---and its
+receptive field must match the model's, since a ceiling regressed on each
+cell's own land cover does not bound a model that reads across space. We
+found the second the hard way: our own simulator clears Austin's per-cell
+ceiling on the days it is scored on.
+
+Five results transfer beyond the simulator used to demonstrate them.
+First, the ceiling diagnostic itself, validated across 49 cities and made
+actionable through a cheap thermal-gap heuristic and a predictable NDVI
+channel screen. Second, evidence that the arid inversion is climatic
+rather than continental, established on 28 cities across five continents
+under a uniform city definition---while being explicit that the American
+Southwest cases are definition-sensitive.
+
+Third, and the result we did not expect, that the inversion is a
+pixel-scale effect. Across both samples every inverting city recovers
+once the ceiling is allowed to read neighbourhoods---to between $+0.47$
+and $+0.91$ globally, and $+0.42$ to $+0.75$ in the US---and no city in
+either sample remains data-limited (global minimum $+0.463$, US minimum
+$+0.335$). The arid/non-arid ceiling difference ceases to be detectable
+globally ($p = 0.018$ at pixel scale, $p = 0.115$ matched). What limits
+these cities is the scale at which land cover is read, not the city, and
+the correction applies everywhere rather than to arid cities alone: all
+49 US cities gain, with the size of the gain tracking how low the
+per-cell ceiling was rather than how hot the city is. A readiness
+assessment should therefore report the scale at which land cover becomes
+informative rather than a single per-city number.
+
+Fourth, a diffusion--fidelity trade-off roughly twice as steep as a naive
+estimate. Fifth, an evapotranspiration ablation showing that a standard
+linear ET term contributes nothing to spatial-pattern skill at 500~m,
+regardless of formulation.
+
+The simulator itself achieves $r = +0.754$ on held-out MODIS days using
+only inputs retrievable by anonymous HTTP request, which makes every
+result above independently checkable without an institutional data
+agreement.
+
+%=================================================================
+\vspace{6pt}
+
+\funding{This research received no external funding.}
+
+\institutionalreview{Not applicable.}
+
+\informedconsent{Not applicable.}
+
+\dataavailability{All input data are publicly available without
+authentication: MODIS MYD11A1 and MOD13A1 via the Microsoft Planetary
+Computer STAC API, ESA WorldCover v200 via the Copernicus/ESA object
+store, ERA5 via the Google ARCO-ERA5 Zarr mirror, and administrative
+boundaries via OpenStreetMap. Source code, calibration artifacts and the
+scripts that regenerate every figure and table reported here are
+available at \url{https://github.com/abhi-is-cool/austin-twin}.}
+
+% REVIEW AND EDIT THIS TO MATCH WHAT YOU ACTUALLY DID -- MDPI requires
+% disclosure of GenAI used for code, analysis, figures or text.
+\acknowledgments{MODIS data are provided via the Microsoft Planetary
+Computer; ESA WorldCover via Copernicus/ESA; ERA5 via Google ARCO-ERA5 on
+Google Cloud Storage; OpenStreetMap data are copyright OpenStreetMap
+contributors and licensed under the ODbL. During the preparation of this
+manuscript, the author used Claude (Anthropic) for the purposes of
+software implementation, analysis scripting, figure generation and
+manuscript drafting. The author has reviewed and edited the output and
+takes full responsibility for the content of this publication.}
+
+\conflictsofinterest{The author declares no conflicts of interest.}
+
+\abbreviations{Abbreviations}{%
+The following abbreviations are used in this manuscript:\\
+
+\noindent
+\begin{tabular}{@{}ll}
+ARCO & Analysis-Ready, Cloud-Optimised\\
+CFL & Courant--Friedrichs--Lewy\\
+ET & Evapotranspiration\\
+LAI & Leaf Area Index\\
+LST & Land Surface Temperature\\
+NDVI & Normalised Difference Vegetation Index\\
+PM & Penman--Monteith\\
+STAC & SpatioTemporal Asset Catalog\\
+UHI & Urban Heat Island\\
+UTM & Universal Transverse Mercator\\
+VPD & Vapour Pressure Deficit
+\end{tabular}
+}
+
+%=================================================================
+\begin{adjustwidth}{-\extralength}{0cm}
+
+\reftitle{References}
+
+\isAPAandChicago{}{%
+\begin{thebibliography}{999}
+
+\bibitem[Bhamjee et al.(2024)]{bhamjee2024detection}
+Bhamjee, M.; et al. Detection and characterization of urban heat islands
+with machine learning. In Proceedings of IGARSS 2024, pp. 1693--1699.
+
+\bibitem[Bueno et al.(2013)]{bueno2013urban}
+Bueno, B.; Norford, L.; Hidalgo, J.; Pigeon, G. The urban weather
+generator. \textit{J. Build. Perform. Simul.} \textbf{2013}, \textit{6},
+269--281.
+
+% VERIFY: standard gradient-boosting reference, added for the nonlinear
+% ceiling estimator. Check the volume and page range before submitting.
+\bibitem[Friedman(2001)]{friedman2001greedy}
+Friedman, J.H. Greedy function approximation: A gradient boosting machine.
+\textit{Ann. Stat.} \textbf{2001}, \textit{29}, 1189--1232.
+
+\bibitem[Hersbach et al.(2020)]{hersbach2020era5}
+Hersbach, H.; et al. The ERA5 global reanalysis. \textit{Q. J. R.
+Meteorol. Soc.} \textbf{2020}, \textit{146}, 1999--2049.
+
+\bibitem[Hoang and Nguyen(2025)]{hoang2025geospatial}
+Hoang, N.D.; Nguyen, Q.L. Geospatial analysis and machine learning
+framework for urban heat island intensity prediction.
+\textit{Sustainability} \textbf{2025}, \textit{17}, 4287.
+
+\bibitem[HeatMat(2025)]{heatmat2025}
+[Authors]. HeatMat: Simulation of city material impact on urban heat
+island effect. \textit{arXiv} \textbf{2025}, arXiv:2601.22796.
+
+\bibitem[Krayenhoff et al.(2021)]{krayenhoff2021albedo}
+Krayenhoff, E.S.; et al. Cooling hot cities: A systematic and critical
+review. \textit{Environ. Res. Lett.} \textbf{2021}, \textit{16}, 053007.
+
+\bibitem[Kusaka et al.(2001)]{kusaka2001simple}
+Kusaka, H.; et al. A simple single-layer urban canopy model.
+\textit{Bound.-Layer Meteorol.} \textbf{2001}, \textit{101}, 329--358.
+
+\bibitem[Lyu et al.(2022)]{lyu2022integrated}
+Lyu, F.; et al. An integrated CyberGIS and machine learning framework for
+fine-scale urban heat island prediction. \textit{Urban Inform.}
+\textbf{2022}, \textit{1}, 6.
+
+\bibitem[Masson(2000)]{masson2000physically}
+Masson, V. A physically-based scheme for the urban energy budget.
+\textit{Bound.-Layer Meteorol.} \textbf{2000}, \textit{94}, 357--397.
+
+\bibitem[Microsoft(2023)]{microsoft_pc}
+Microsoft. Planetary Computer STAC API. Available online:
+\url{https://planetarycomputer.microsoft.com} (accessed on 1 September
+2026).
+
+\bibitem[Mitraka et al.(2025)]{mitraka2025prototypes}
+Mitraka, Z.; et al. Prototypes for enhanced urban heat monitoring.
+\textit{Discov. Cities} \textbf{2025}, \textit{2}, 14.
+
+\bibitem[Oke(1982)]{oke1982energetic}
+Oke, T.R. The energetic basis of the urban heat island. \textit{Q. J. R.
+Meteorol. Soc.} \textbf{1982}, \textit{108}, 1--24.
+
+\bibitem[Santamouris(2014)]{santamouris2014cool}
+Santamouris, M. Cooling the cities---A review of reflective and green
+roof mitigation technologies. \textit{Sol. Energy} \textbf{2014},
+\textit{103}, 682--703.
+
+\bibitem[Storn and Price(1997)]{storn1997differential}
+Storn, R.; Price, K. Differential evolution---A simple and efficient
+heuristic. \textit{J. Glob. Optim.} \textbf{1997}, \textit{11}, 341--359.
+
+\bibitem[Voogt and Oke(2003)]{voogt2003thermal}
+Voogt, J.A.; Oke, T.R. Thermal remote sensing of urban climates.
+\textit{Remote Sens. Environ.} \textbf{2003}, \textit{86}, 370--384.
+
+\bibitem[Wang and Li(2022)]{wang2022berlin}
+Wang, X.; Li, H. The effectiveness of cool and green roofs in mitigating
+urban heat island. \textit{Build. Environ.} \textbf{2022}, \textit{217},
+109082.
+
+\bibitem[Wesley et al.(2026)]{wri2026cooling}
+Wesley, E.J.; Mackres, E.; Pool, J. Cooling potential of urban trees.
+\textit{WRI Insights} \textbf{2026}.
+
+\bibitem[Zanaga et al.(2022)]{zanaga2022esa}
+Zanaga, D.; et al. ESA WorldCover 10~m 2021 v200. \textit{Zenodo}
+\textbf{2022}.
+
+\bibitem[Zhou et al.(2025)]{zhou2025tree}
+Zhou, W.; et al. Increasing tree canopy lowers urban air temperature by
+up to 1.5~$^{\circ}$C. \textit{npj Urban Sustain.} \textbf{2025},
+\textit{5}, 92.
+
+\bibitem[Ziter et al.(2019)]{ziter2019scale}
+Ziter, C.D.; et al. Scale-dependent interactions between tree canopy
+cover and impervious surfaces. \textit{Proc. Natl. Acad. Sci. USA}
+\textbf{2019}, \textit{116}, 7575--7580.
+
+\end{thebibliography}
+}
+
+\PublishersNote{}
+\end{adjustwidth}
+\end{document}

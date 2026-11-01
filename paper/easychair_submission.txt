@@ -1,0 +1,22 @@
+======================================================================
+TITLE  (paste into 'Title')
+======================================================================
+
+Why a Land-Cover Data Ceiling Must Match a Model's Receptive Field
+
+======================================================================
+ABSTRACT  (paste into 'Abstract')  -- 229 words, 1569 chars
+======================================================================
+
+When an urban heat island (UHI) model generalizes poorly to a new city, the UHI model might be instantiated on a land cover that simply does not delineate thermal regimes well enough for any land-cover-driven model to succeed—or the model might not have succeeded; the land-cover data ceiling—the achievable correlation between land surface temperature and a specified set of land-cover channels—is designed to distinguish between these possibilities, but the current work finds this ceiling only constrains a model when the model's spatial support, or receptive field, is equivalent to the ceiling's. Because a per-cell ceiling regresses temperature solely on the cell's land cover while models with spatial reach regress on the cell's land cover and that of the surrounding neighborhood, a physics-based simulator trained on held-out days in Austin, TX scored r=+0.754 against a per-cell ceiling of r=+0.693 (109% of the presumed bound)—an artifact that was circumvented when the ceiling estimator was allowed the same neighborhood context the simulator leverages, pushing the Austin ceiling to r=+0.789; the same per-cell/context gap appears in Phoenix, Denver, and Miami. A fully-convolutional network trained directly on land cover replicated this pattern across all four cities—anchoring to the per-cell ceiling at a one-cell receptive field, tracking the context ceiling when matched, and surpassing it with an expanded one—ensuring the suggested percent-of-ceiling metric is uninterpretable unless the ceiling's receptive field is stated explicitly and matched.
+
+======================================================================
+KEYWORDS  (one per line)
+======================================================================
+
+urban heat island
+land surface temperature
+MODIS
+model transferability
+convolutional networks
+thermal remote sensing

@@ -1,0 +1,276 @@
+{
+  "lit_band_m": [
+    100.0,
+    300.0
+  ],
+  "popsize": 8,
+  "maxiter": 12,
+  "rows": [
+    {
+      "D": 0.05,
+      "test_r": 0.6583329160956475,
+      "test_rmse": 1.7278575897216797,
+      "half_cooling_edge_m": 293.20404105515945,
+      "half_cooling_robust_m": 1087.9877932150393,
+      "half_cooling_legacy_m": 245.81727849079775,
+      "decay_length_robust_m": Infinity,
+      "peak_dt_c": 1.0972652435302734,
+      "n_bins_robust": 6,
+      "n_bins_legacy": 3,
+      "coefs": {
+        "absorption_impervious": 0.8,
+        "absorption_vegetation": 0.6701442527656241,
+        "absorption_water": 0.171778229994093,
+        "et_coeff": 58.10986132690213,
+        "diffusion_m2_s": 0.05
+      }
+    },
+    {
+      "D": 0.07927357886906199,
+      "test_r": 0.6570883809695847,
+      "test_rmse": 1.6972111463546753,
+      "half_cooling_edge_m": 293.8484362027714,
+      "half_cooling_robust_m": 1090.2157575740232,
+      "half_cooling_legacy_m": 299.61479569535896,
+      "decay_length_robust_m": Infinity,
+      "peak_dt_c": 1.0448694229125977,
+      "n_bins_robust": 6,
+      "n_bins_legacy": 3,
+      "coefs": {
+        "absorption_impervious": 0.8014844045248412,
+        "absorption_vegetation": 0.7,
+        "absorption_water": 0.18,
+        "et_coeff": 58.78550390215496,
+        "diffusion_m2_s": 0.07927357886906199
+      }
+    },
+    {
+      "D": 0.1256860061341878,
+      "test_r": 0.661460470007909,
+      "test_rmse": 1.6742146611213684,
+      "half_cooling_edge_m": 294.83249218316723,
+      "half_cooling_robust_m": 1091.8604538133327,
+      "half_cooling_legacy_m": 367.2003962189095,
+      "decay_length_robust_m": Infinity,
+      "peak_dt_c": 1.0997343063354492,
+      "n_bins_robust": 7,
+      "n_bins_legacy": 3,
+      "coefs": {
+        "absorption_impervious": 0.8001331965417197,
+        "absorption_vegetation": 0.6930538031084946,
+        "absorption_water": 0.1770032070464044,
+        "et_coeff": 54.846073083458805,
+        "diffusion_m2_s": 0.1256860061341878
+      }
+    },
+    {
+      "D": 0.19927159040031886,
+      "test_r": 0.6675795554504098,
+      "test_rmse": 1.6501717567443848,
+      "half_cooling_edge_m": 297.3671635385024,
+      "half_cooling_robust_m": 1094.1313972424825,
+      "half_cooling_legacy_m": 235.78322040582273,
+      "decay_length_robust_m": Infinity,
+      "peak_dt_c": 1.1896114349365234,
+      "n_bins_robust": 8,
+      "n_bins_legacy": 4,
+      "coefs": {
+        "absorption_impervious": 0.8011725800846669,
+        "absorption_vegetation": 0.6779727127713658,
+        "absorption_water": 0.17982155558687393,
+        "et_coeff": 53.85530147523301,
+        "diffusion_m2_s": 0.19927159040031886
+      }
+    },
+    {
+      "D": 0.31593944275926183,
+      "test_r": 0.684113744403809,
+      "test_rmse": 1.6114078760147095,
+      "half_cooling_edge_m": 300.797750401714,
+      "half_cooling_robust_m": 1097.2549400197602,
+      "half_cooling_legacy_m": 271.1461399489277,
+      "decay_length_robust_m": Infinity,
+      "peak_dt_c": 1.414229393005371,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 4,
+      "coefs": {
+        "absorption_impervious": 0.8029489002890154,
+        "absorption_vegetation": 0.6285168891125993,
+        "absorption_water": 0.17604452304784246,
+        "et_coeff": 40.024784652763,
+        "diffusion_m2_s": 0.31593944275926183
+      }
+    },
+    {
+      "D": 0.5009130066684768,
+      "test_r": 0.7127584763664794,
+      "test_rmse": 1.5361496210098267,
+      "half_cooling_edge_m": 309.0439454046448,
+      "half_cooling_robust_m": 1095.8052793970962,
+      "half_cooling_legacy_m": 303.98895349382803,
+      "decay_length_robust_m": Infinity,
+      "peak_dt_c": 1.8680830001831055,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 4,
+      "coefs": {
+        "absorption_impervious": 0.8005031254968968,
+        "absorption_vegetation": 0.534873525900201,
+        "absorption_water": 0.1754328659019141,
+        "et_coeff": 18.019516870844743,
+        "diffusion_m2_s": 0.5009130066684768
+      }
+    },
+    {
+      "D": 0.794183334813449,
+      "test_r": 0.741555071112425,
+      "test_rmse": 1.459933340549469,
+      "half_cooling_edge_m": 320.1187752166343,
+      "half_cooling_robust_m": 1097.6461079252988,
+      "half_cooling_legacy_m": 345.2939328517884,
+      "decay_length_robust_m": Infinity,
+      "peak_dt_c": 2.2235336303710938,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 4,
+      "coefs": {
+        "absorption_impervious": 0.8000953222791024,
+        "absorption_vegetation": 0.46983457913886933,
+        "absorption_water": 0.17599973788452383,
+        "et_coeff": 13.15995146648508,
+        "diffusion_m2_s": 0.794183334813449
+      }
+    },
+    {
+      "D": 1.2591551045765723,
+      "test_r": 0.7721846177353877,
+      "test_rmse": 1.3555858731269836,
+      "half_cooling_edge_m": 337.09852429657144,
+      "half_cooling_robust_m": 1096.5866829457677,
+      "half_cooling_legacy_m": 269.8657947524092,
+      "decay_length_robust_m": 7048.791556290247,
+      "peak_dt_c": 2.451876640319824,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 5,
+      "coefs": {
+        "absorption_impervious": 0.8043420096808702,
+        "absorption_vegetation": 0.4285573899876698,
+        "absorption_water": 0.17703400250117002,
+        "et_coeff": 5.180981574409831,
+        "diffusion_m2_s": 1.2591551045765723
+      }
+    },
+    {
+      "D": 1.9963546298206583,
+      "test_r": 0.7991843383349051,
+      "test_rmse": 1.2659313678741455,
+      "half_cooling_edge_m": 356.37272597602396,
+      "half_cooling_robust_m": 1107.0182863999792,
+      "half_cooling_legacy_m": 320.4942095347916,
+      "decay_length_robust_m": 2319.4967157137567,
+      "peak_dt_c": 2.5710182189941406,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 5,
+      "coefs": {
+        "absorption_impervious": 0.802917343379467,
+        "absorption_vegetation": 0.40054757225658,
+        "absorption_water": 0.17625695902455998,
+        "et_coeff": 6.640097072081744,
+        "diffusion_m2_s": 1.9963546298206583
+      }
+    },
+    {
+      "D": 3.1651635239541003,
+      "test_r": 0.8228391682134133,
+      "test_rmse": 1.1835576891899109,
+      "half_cooling_edge_m": 875.0,
+      "half_cooling_robust_m": 1120.74086923908,
+      "half_cooling_legacy_m": 315.49872255405734,
+      "decay_length_robust_m": 1514.6512022573472,
+      "peak_dt_c": 2.5473175048828125,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 7,
+      "coefs": {
+        "absorption_impervious": 0.8026564580363473,
+        "absorption_vegetation": 0.3757912770472783,
+        "absorption_water": 0.15913746585661737,
+        "et_coeff": 5.824891077348088,
+        "diffusion_m2_s": 3.1651635239541003
+      }
+    },
+    {
+      "D": 5.018276804993071,
+      "test_r": 0.840363178796444,
+      "test_rmse": 1.1215948462486267,
+      "half_cooling_edge_m": 875.0,
+      "half_cooling_robust_m": 1158.8615182905942,
+      "half_cooling_legacy_m": 373.2764651994052,
+      "decay_length_robust_m": 1235.4397391431733,
+      "peak_dt_c": 2.426187515258789,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 8,
+      "coefs": {
+        "absorption_impervious": 0.8006267667442585,
+        "absorption_vegetation": 0.3490547605866356,
+        "absorption_water": 0.18,
+        "et_coeff": 5.770119780540959,
+        "diffusion_m2_s": 5.018276804993071
+      }
+    },
+    {
+      "D": 7.956335241748048,
+      "test_r": 0.8490260780651333,
+      "test_rmse": 1.0913890898227692,
+      "half_cooling_edge_m": 875.0,
+      "half_cooling_robust_m": 1207.8923139172928,
+      "half_cooling_legacy_m": 447.3818554431216,
+      "decay_length_robust_m": 1145.924270782502,
+      "peak_dt_c": 2.256746292114258,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 9,
+      "coefs": {
+        "absorption_impervious": 0.8017891565878379,
+        "absorption_vegetation": 0.3180145225892499,
+        "absorption_water": 0.13802568499396037,
+        "et_coeff": 9.530506777498985,
+        "diffusion_m2_s": 7.956335241748048
+      }
+    },
+    {
+      "D": 12.61454338590822,
+      "test_r": 0.8526399158485488,
+      "test_rmse": 1.0783959329128265,
+      "half_cooling_edge_m": 875.0,
+      "half_cooling_robust_m": 1257.05809737124,
+      "half_cooling_legacy_m": 528.1163021084889,
+      "decay_length_robust_m": 1143.1428204902056,
+      "peak_dt_c": 2.041396141052246,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 11,
+      "coefs": {
+        "absorption_impervious": 0.884578989810588,
+        "absorption_vegetation": 0.3736741515856167,
+        "absorption_water": 0.047005820450084446,
+        "et_coeff": 12.6748121219041,
+        "diffusion_m2_s": 12.61454338590822
+      }
+    },
+    {
+      "D": 20.0,
+      "test_r": 0.8522589725071945,
+      "test_rmse": 1.0807790458202362,
+      "half_cooling_edge_m": 875.0,
+      "half_cooling_robust_m": 1320.0223858012603,
+      "half_cooling_legacy_m": 629.5835163227804,
+      "decay_length_robust_m": 1202.7763811332966,
+      "peak_dt_c": 1.7369298934936523,
+      "n_bins_robust": 9,
+      "n_bins_legacy": 12,
+      "coefs": {
+        "absorption_impervious": 0.9669055296146009,
+        "absorption_vegetation": 0.43772512070362074,
+        "absorption_water": 0.05104802736869674,
+        "et_coeff": 12.481200836407883,
+        "diffusion_m2_s": 20.0
+      }
+    }
+  ]
+}

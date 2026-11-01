@@ -1,0 +1,17 @@
+{
+  "n_cities": 28,
+  "inverting_nonus": [
+    "alice_springs",
+    "amman",
+    "antofagasta",
+    "cairo",
+    "hermosillo",
+    "madrid",
+    "marrakesh",
+    "mendoza",
+    "riyadh"
+  ],
+  "n_inverting": 11,
+  "gap_rho_multi": 0.5714285714285714,
+  "gap_rho_uni": 0.916256157635468
+}

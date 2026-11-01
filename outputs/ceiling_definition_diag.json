@@ -1,0 +1,38 @@
+[
+  {
+    "city": "austin",
+    "date": "2024-08-22",
+    "univariate_ceiling": 0.6706773110851569,
+    "multivariate_ceiling": 0.7035265323342941,
+    "best_model_r": 0.758,
+    "model_over_uni": 1.1302007500053264,
+    "model_over_multi": 1.0774291589045881
+  },
+  {
+    "city": "phoenix",
+    "date": "2024-07-22",
+    "univariate_ceiling": 0.36317335367442205,
+    "multivariate_ceiling": 0.41249182420968067,
+    "best_model_r": 0.083,
+    "model_over_uni": 0.2285409960842224,
+    "model_over_multi": 0.2012161093350759
+  },
+  {
+    "city": "denver",
+    "date": "2024-07-25",
+    "univariate_ceiling": 0.13108058893941524,
+    "multivariate_ceiling": 0.1484714523184357,
+    "best_model_r": 0.004,
+    "model_over_uni": 0.030515578487740693,
+    "model_over_multi": 0.026941206121032332
+  },
+  {
+    "city": "miami",
+    "date": "2024-04-16",
+    "univariate_ceiling": 0.8270466694896612,
+    "multivariate_ceiling": 0.8424815477983674,
+    "best_model_r": 0.832,
+    "model_over_uni": 1.005989178958178,
+    "model_over_multi": 0.9875587212256951
+  }
+]
